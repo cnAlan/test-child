@@ -1,0 +1,84 @@
+broker:
+  debug:
+    flask_debug: on # on or false
+
+  host:
+    ip: ip address
+    port: port number
+
+  # a secret key for Flask application.
+  secret_key: some secret key
+
+  mysql:
+    host:
+      ip: ip address
+      port: port number
+    user: user
+    password: password
+    database: database name
+    charset: charset
+    pool_recycle: number
+
+  mongodb:
+    host: mongodb server host
+    ip: ip address
+    port: port number
+
+  redis:
+    host: redis server host
+    ip: ip address
+    port: port number
+
+  ding_talk_app:
+    token:
+      corp_id: corp_id
+      corp_secret: corp_secret
+      url: https://oapi.dingtalk.com/gettoken?corpid={corp_id}&corpsecret={corp_secret}
+    warn:
+      url: https://oapi.dingtalk.com/message/send?access_token={dingtalk_access_token}
+      agentid: agentid
+
+  weixin_app:
+    token:
+      corp_id: corp_id
+      corp_secret: corp_secret
+      url: https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={corp_id}&corpsecret={corp_secret}
+    warn:
+      url: https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={weixin_access_token}
+      agentid: agentid
+
+  # cloud url for sms status.
+  # WARN: this config will deprecated in future release.
+  cloud:
+    base:
+      url: https://www.example.com
+    put:
+      url: https://www.example.com/api/v1/repos/{owner}/{repo}/sms/status
+
+  sms:
+    status:
+      cloud:
+        base:
+          url: https://www.example.com
+        put:
+          url: https://www.example.com/api/v1/repos/{owner}/{repo}/sms/status
+    task_check:
+      cloud:
+        base:
+          url: https://www.example.com
+        put:
+          url: https://www.example.com/api/v1/repos/{owner}/{repo}/sms/task-check
+
+  hpc:
+    disk_usage:
+      cloud:
+        put:
+          url: https://www.example.com/api/v1/hpc/users/{user}/disk/usage
+    disk_space:
+      cloud:
+        put:
+          url: https://www.example.com/api/v1/hpc/info/disk/space
+    loadleveler_status:
+      cloud:
+        put:
+          url: https://www.example.com/api/v1/hpc/users/{user}/loadleveler/status
