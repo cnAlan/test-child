@@ -77,7 +77,7 @@ def test_create_filter(monkeypatch):
     def mock_now(tz=None):
         return datetime.datetime(2017, 3, 4, 5, 6, 8)
 
-    monkeypatch.setattr(PatchedDatetime, 'now', mock_now)
+    monkeypatch.setattr(PatchedDatetime, 'utcnow', mock_now)
     datetime.datetime = PatchedDatetime
     a_filter = create_filter()
 
