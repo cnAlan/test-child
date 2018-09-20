@@ -4,16 +4,13 @@ from datetime import datetime
 import pytest
 
 
-@pytest.fixture
-def app():
-    from nmp_broker import create_app
-    app = create_app()
-    yield app
+from .fixture import app
 
 
 def test_save_to_cache(app):
     with app.app_context():
-        from nmp_broker.common.data_store.mongodb.workflow import get_server_status_from_cache, save_server_status_to_cache
+        from nmp_broker.common.data_store.mongodb.workflow import \
+            get_server_status_from_cache, save_server_status_to_cache
         owner = 'nwpc_xp'
         repo = 'nwpc_op'
         server_name = 'nwpc_op'

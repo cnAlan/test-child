@@ -8,7 +8,7 @@ from nmp_model.mongodb.workflow_cache import WorkflowCacheData, WorkflowCache
 
 
 def save_server_status_to_nmp_model_system(
-        owner: str, repo: str, sms_name: str,
+        owner: str, repo: str, server_name: str,
         message: dict,
         error_task_dict_list: list
 ) -> dict:
@@ -17,7 +17,7 @@ def save_server_status_to_nmp_model_system(
 
     :param owner:
     :param repo:
-    :param sms_name:
+    :param server_name:
     :param message:
     :param error_task_dict_list:
     :return:
@@ -30,7 +30,7 @@ def save_server_status_to_nmp_model_system(
         data=StatusBlobData(
             name='sms_server_status',
             content=StatusContent(
-                server_name=sms_name,
+                server_name=server_name,
                 collected_time=message['time'],
                 update_time=datetime.datetime.utcnow(),
                 status=message['status']
@@ -49,7 +49,7 @@ def save_server_status_to_nmp_model_system(
         data=AbortedTasksBlobData(
             name='sms_server_aborted_tasks',
             content=AbortedTasksContent(
-                status_blob_id=status_blob.ticket_id,
+                status_blob_ticket_id=status_blob.ticket_id,
                 server_name='sms_server_aborted_tasks',
                 collected_time=message['time'],
                 tasks=error_task_dict_list
@@ -80,14 +80,14 @@ def save_server_status_to_nmp_model_system(
     tree_object.save()
 
     commit_object = Commit(
-        id=get_new_64bit_ticket(),
+        ticket_id=get_new_64bit_ticket(),
         owner=owner,
         repo=repo,
         data=CommitData(
             committer='aix',
             type='status',
             tree_ticket_id=tree_object.ticket_id,
-            commited_time=datetime.datetime.utcnow()
+            committed_time=datetime.datetime.utcnow()
         )
     )
     commit_object.save()
