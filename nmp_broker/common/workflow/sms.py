@@ -107,7 +107,7 @@ def sms_status_message_handler(message_data: dict) -> None:
         server_status = bunch.status
 
         if server_status == NodeStatus.Aborted:
-            cached_sms_server_status = data_store.get_sms_server_status_from_cache(owner, repo, sms_name)
+            cached_sms_server_status = data_store.get_server_status_from_cache(owner, repo, sms_name)
             if cached_sms_server_status is not None:
 
                 print('building bunch from cache message...')
@@ -159,7 +159,7 @@ def sms_status_message_handler(message_data: dict) -> None:
         }
         data_store.save_error_task_list_to_cache(owner, repo, error_task_value)
 
-        data_store.save_sms_server_status_to_cache(owner, repo, sms_name, message_data)
+        data_store.save_server_status_to_cache(owner, repo, sms_name, message_data)
 
         # 发送给外网服务器
         website_url = current_app.config['BROKER_CONFIG']['cloud']['put']['url'].format(

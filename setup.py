@@ -23,6 +23,7 @@ setup(
         'pymongo',
         'PyYAML',
         'redis',
+        'requests',
         'SQLAlchemy'
     ]
 )

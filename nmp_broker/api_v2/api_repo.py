@@ -6,7 +6,7 @@ from nmp_broker.common.database import db
 
 from nmp_broker.api_v2 import api_v2_app
 
-from nwpc_monitor.model import Repo, Owner, OrgUser, DingtalkUser, DingtalkWarnWatch
+from nmp_model.rmdb import Repo, Owner, OrgUser, DingtalkUser, DingtalkWarnWatch
 
 from sqlalchemy import and_, func
 

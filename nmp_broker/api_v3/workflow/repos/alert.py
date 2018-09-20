@@ -5,7 +5,7 @@ from sqlalchemy import and_, func
 
 from nmp_broker.common.database import db
 from nmp_broker.api_v3 import api_v3_app
-from nwpc_monitor.model import Repo, Owner, OrgUser, DingtalkUser, DingtalkWarnWatch
+from nmp_model.rmdb import Repo, Owner, OrgUser, DingtalkUser, DingtalkWarnWatch
 
 
 @api_v3_app.route('/workflow/repos/<owner>/<repo>/alert/dingtalk/watch/watchers')

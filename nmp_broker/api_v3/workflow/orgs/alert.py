@@ -4,7 +4,7 @@ from flask import jsonify
 from nmp_broker.api_v3 import api_v3_app
 from nmp_broker.common.database import db
 
-from nwpc_monitor.model import Repo, Owner, User, OrgUser, DingtalkUser, DingtalkWarnWatch
+from nmp_model.rmdb import Repo, Owner, User, OrgUser, DingtalkUser, DingtalkWarnWatch
 
 from sqlalchemy import func
 

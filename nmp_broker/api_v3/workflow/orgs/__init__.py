@@ -26,7 +26,7 @@ def get_org_repos(org):
             'name': an_repo.repo_name,
             'description': an_repo.repo_description
         }
-        sms_server_status = data_store.get_sms_server_status_from_cache(org, an_repo.repo_name, an_repo.repo_name)
+        sms_server_status = data_store.get_server_status_from_cache(org, an_repo.repo_name, an_repo.repo_name)
         if sms_server_status is not None:
             repo['update_time'] = sms_server_status['update_time']
         else:
