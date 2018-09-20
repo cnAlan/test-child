@@ -150,7 +150,7 @@ def receive_ecflow_status_message():
 #             }
 #         }
 #
-#         takler_object_system_dict = data_store.save_sms_task_check_to_nwpc_takler_object_system(
+#         takler_object_system_dict = data_store.save_task_check_to_nmp_model_system(
 #             owner, repo,
 #             message_data, unfit_node_list
 #         )

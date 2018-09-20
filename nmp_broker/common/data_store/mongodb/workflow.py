@@ -4,10 +4,10 @@ from nmp_broker.common.data_store.rmdb import get_new_64bit_ticket
 
 from nmp_model.mongodb.tree import TreeData, Tree, TreeNode
 from nmp_model.mongodb.commit import CommitData, Commit
-from nmp_model.mongodb.workload_cache import WorkloadCacheData, WorkloadCache
+from nmp_model.mongodb.workflow_cache import WorkflowCacheData, WorkflowCache
 
 
-def save_sms_server_status_to_nwpc_takler_object_system(
+def save_server_status_to_nmp_model_system(
         owner: str, repo: str, sms_name: str,
         message: dict,
         error_task_dict_list: list
@@ -137,7 +137,7 @@ def save_sms_server_status_to_nwpc_takler_object_system(
     }
 
 
-def save_sms_task_check_to_nwpc_takler_object_system(
+def save_task_check_to_nmp_model_system(
         owner: str, repo: str,
         message_data: dict,
         unfit_node_list: list
@@ -261,9 +261,10 @@ def save_sms_task_check_to_nwpc_takler_object_system(
     }
 
 
-# sms
+# WorkflowCache
+
 def get_server_status_from_cache(owner: str, repo: str, server_name: str) -> dict or None:
-    result_set = WorkloadCache.objects(owner=owner, repo=repo, data__server_name=server_name)
+    result_set = WorkflowCache.objects(owner=owner, repo=repo, data__server_name=server_name)
     if len(result_set) == 0:
         return None
     else:
@@ -271,9 +272,9 @@ def get_server_status_from_cache(owner: str, repo: str, server_name: str) -> dic
 
 
 def save_server_status_to_cache(owner: str, repo: str, server_name: str, message: dict) -> None:
-    result_set = WorkloadCache.objects(owner=owner, repo=repo, data__server_name=server_name)
+    result_set = WorkflowCache.objects(owner=owner, repo=repo, data__server_name=server_name)
 
-    data = WorkloadCacheData(
+    data = WorkflowCacheData(
         server_name=server_name,
         collected_time=message['time'],
         update_time=datetime.datetime.utcnow(),
@@ -281,7 +282,7 @@ def save_server_status_to_cache(owner: str, repo: str, server_name: str, message
     )
 
     if len(result_set) == 0:
-        server_status_cache = WorkloadCache(
+        server_status_cache = WorkflowCache(
             ticket_id=get_new_64bit_ticket(),
             owner=owner,
             repo=repo,

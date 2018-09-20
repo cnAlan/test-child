@@ -118,7 +118,7 @@ def sms_status_message_handler(message_data: dict) -> None:
 
                 # if True:
                 if is_new_abort_task_found(owner, repo, previous_server_status, error_task_dict_list):
-                    takler_object_system_dict = data_store.save_sms_server_status_to_nwpc_takler_object_system(
+                    takler_object_system_dict = data_store.save_server_status_to_nmp_model_system(
                         owner, repo, sms_name,
                         message_data, error_task_dict_list
                     )
