@@ -47,6 +47,7 @@ class Config(object):
                     )
 
                 self.SQLALCHEMY_POOL_RECYCLE = pool_recycle
+                self.SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     def load_config(self, config_path):
         pass
