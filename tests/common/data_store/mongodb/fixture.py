@@ -3,7 +3,7 @@ import pytest
 from nmp_broker import create_app
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def app():
     app = create_app()
     yield app

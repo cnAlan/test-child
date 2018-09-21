@@ -68,3 +68,60 @@ def test_save_server_status(app):
         # check commits
         commit = commits[0]
         assert commit['data']['tree_ticket_id'] == tree['ticket_id']
+
+
+def test_save_tasks_check(app):
+    with app.app_context():
+        from nmp_broker.common.data_store.mongodb.workflow import save_task_check_to_nmp_model_system
+        owner = 'nwp_xp'
+        repo = 'nwpc_op'
+
+        message_data = {
+            'request': {
+                'task': {
+                    'name': 'meso cold 00H',
+                    'trigger': [
+                        {
+                            'type': 'time',
+                            'time': '19:51:00'
+                        }
+                    ]
+                }
+            },
+        }
+
+        unfit_node_list = [
+            {
+                'node_path': '/ocean/seafog/12',
+                'unfit_check_list': [
+                    {
+                        'type': 'status',
+                        'is_condition_fit': 'false',
+                        'value': 'aborted',
+                        'expected_value': {
+                            'operator': 'in',
+                            'fields': [
+                                'submitted',
+                                'active',
+                                'complete'
+                            ]
+                        }
+
+                    },
+                    {
+                        'type': 'variable',
+                        'name': 'SMSDATE',
+                        'is_condition_fit': 'false',
+                        'expected_value': '20180920',
+                        'value': '20180919'
+                    }
+                ]
+            }
+        ]
+
+        result = save_task_check_to_nmp_model_system(
+            owner,
+            repo,
+            message_data,
+            unfit_node_list
+        )
