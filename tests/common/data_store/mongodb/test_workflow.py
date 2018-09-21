@@ -1,8 +1,6 @@
 # coding: utf-8
 from datetime import datetime
 
-from .fixture import app
-
 
 def test_save_server_status(app):
     with app.app_context():

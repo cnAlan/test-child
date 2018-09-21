@@ -4,9 +4,6 @@ from datetime import datetime
 import pytest
 
 
-from .fixture import app
-
-
 def test_save_to_cache(app):
     with app.app_context():
         from nmp_broker.common.data_store.mongodb.workflow import \
