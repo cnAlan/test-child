@@ -125,3 +125,24 @@ def test_save_tasks_check(app):
             message_data,
             unfit_node_list
         )
+
+        blobs = result['blobs']
+        trees = result['trees']
+        commits = result['commits']
+
+        assert len(blobs) == 1
+        assert len(trees) == 1
+        assert len(commits) == 1
+
+        # check blobs
+        unfit_node_blob = blobs[0]
+
+        # check trees
+        tree = trees[0]
+        tree_nodes = tree['data']['nodes']
+        unfit_tasks_node = tree_nodes[0]
+        assert unfit_tasks_node['blob_ticket_id'] == unfit_node_blob['ticket_id']
+
+        # check commits
+        commit = commits[0]
+        assert commit['data']['tree_ticket_id'] == tree['ticket_id']

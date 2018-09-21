@@ -28,7 +28,7 @@ def save_server_status_to_nmp_model_system(
         owner=owner,
         repo=repo,
         data=StatusBlobData(
-            name='sms_server_status',
+            name='server_status',
             content=StatusContent(
                 server_name=server_name,
                 collected_time=message['time'],
@@ -47,10 +47,10 @@ def save_server_status_to_nmp_model_system(
         owner=owner,
         repo=repo,
         data=AbortedTasksBlobData(
-            name='sms_server_aborted_tasks',
+            name='server_aborted_tasks',
             content=AbortedTasksContent(
                 status_blob_ticket_id=status_blob.ticket_id,
-                server_name='sms_server_aborted_tasks',
+                server_name='server_aborted_tasks',
                 collected_time=message['time'],
                 tasks=error_task_dict_list
             )
@@ -66,12 +66,12 @@ def save_server_status_to_nmp_model_system(
             nodes=[
                 TreeNode(
                     type='status',
-                    name='sms_server_status',
+                    name='server_status',
                     blob_ticket_id=status_blob.ticket_id
                 ),
                 TreeNode(
                     type='aborted_tasks',
-                    name='sms_server_aborted_tasks',
+                    name='server_aborted_tasks',
                     blob_ticket_id=aborted_tasks_blob.ticket_id
                 )
             ]
@@ -179,7 +179,7 @@ def save_task_check_to_nmp_model_system(
         owner=owner,
         repo=repo,
         data=UnfitNodesBlobData(
-            name='sms_check_task_unfit_nodes',
+            name='check_task_unfit_nodes',
             content=UnfitNodesContent(
                 name=message_data['request']['task']['name'],
                 trigger=message_data['request']['task']['trigger'],
@@ -198,7 +198,7 @@ def save_task_check_to_nmp_model_system(
             nodes=[
                 TreeNode(
                     type="unfit_tasks",
-                    name="sms_check_task_unfit_nodes",
+                    name="check_task_unfit_nodes",
                     blob_ticket_id=unfit_nodes_blob.ticket_id
                 )
             ]
