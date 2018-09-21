@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 """
 run a simple nmp_broker server.
-
-Set environment variable NWPC_MONITOR_BROKER_CONFIG.
 """
 import click
 import os
@@ -27,6 +25,7 @@ def runserver(config_file):
         host=app.config['BROKER_CONFIG']['host']['ip'],
         port=app.config['BROKER_CONFIG']['host']['port']
     )
+
 
 if __name__ == '__main__':
     runserver()

@@ -62,8 +62,8 @@ def load_config(config_file_path: None or str = None) -> None or Config:
     :return: None or a Config object.
     """
     if config_file_path is None:
-        if 'NWPC_MONITOR_BROKER_CONFIG' in os.environ:
-            config_file_path = os.environ['NWPC_MONITOR_BROKER_CONFIG']
+        if 'NMP_BROKER_CONFIG' in os.environ:
+            config_file_path = os.environ['NMP_BROKER_CONFIG']
         else:
             return None
         

@@ -39,9 +39,12 @@ def save_weixin_access_token_to_cache(access_token: str) -> None:
 
 # workflow error task list
 
-def get_error_task_list_from_cache(owner: str, repo: str)-> dict:
+def get_error_task_list_from_cache(owner: str, repo: str)-> dict or None:
     error_task_key = "{owner}/{repo}/workflow/task/error".format(owner=owner, repo=repo)
-    cached_error_task_value = json.loads(redis_client.get(error_task_key).decode())
+    value = redis_client.get(error_task_key)
+    if value is None:
+        return None
+    cached_error_task_value = json.loads(value.decode())
     return cached_error_task_value
 
 

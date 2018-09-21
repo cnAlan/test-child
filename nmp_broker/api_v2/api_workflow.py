@@ -9,15 +9,15 @@ from flask import request, jsonify, json, current_app
 from nmp_broker.api_v2 import api_v2_app
 from nmp_broker.common import weixin, data_store
 
-from nmp_broker.common.workflow.ecflow import ecflow_status_message_handler
+from nmp_broker.common.workflow.message_handler import handle_status_message
 
 REQUEST_POST_TIME_OUT = 20
 
 
-@api_v2_app.route('/hpc/ecflow/status', methods=['POST'])
-def receive_ecflow_status_message():
+@api_v2_app.route('/hpc/workflow/status', methods=['POST'])
+def receive_workflow_status_message():
     """
-    received ecflow status message, using status message handler which saves
+    received workflow status message, using status message handler which saves
     message to local cache and send message to remote server.
 
     POST data: May be gzipped (according to content-encoding). Contents:
@@ -48,7 +48,7 @@ def receive_ecflow_status_message():
         return jsonify(result)
 
     message_data = message['data']
-    ecflow_status_message_handler(message_data)
+    handle_status_message(message_data)
 
     result = {
         'status': 'ok'

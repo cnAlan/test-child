@@ -1,7 +1,6 @@
 # coding=utf-8
 
 from nmp_broker.common import data_store
-from nwpc_workflow_model.ecflow import NodeStatus
 
 
 def is_new_abort_task_found(owner: str, repo: str, previous_server_status, error_task_dict_list:list):
@@ -19,9 +18,12 @@ def is_new_abort_task_found(owner: str, repo: str, previous_server_status, error
 
     new_error_task_found = True
 
-    if previous_server_status == 'abo' or previous_server_status == NodeStatus.aborted:
+    if previous_server_status == 'abo' \
+            or previous_server_status.name.lower() == 'aborted':
         new_error_task_found = False
         cached_error_task_value = data_store.get_error_task_list_from_cache(owner, repo)
+        if cached_error_task_value is None:
+            return True
         cached_error_task_name_list = [a_task_item['path'] for a_task_item in
                                        cached_error_task_value['error_task_list'] ]
         for a_task in error_task_dict_list:

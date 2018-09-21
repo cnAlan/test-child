@@ -9,38 +9,9 @@ from flask import json, current_app
 from nmp_broker.common import weixin, data_store
 from nwpc_workflow_model.sms import Bunch, ErrorStatusTaskVisitor, pre_order_travel, NodeStatus
 
-from nmp_broker.common.workflow.status_strategy import is_new_abort_task_found
+from nmp_broker.common.workflow.status_strategy import is_new_abort_task_found, is_new_abort_root_found
 
 REQUEST_POST_TIME_OUT = 20
-
-# TODO: need to be changed in nwpc-workflow-model
-#      NodeStatus.Aborted to NodeStatus.aborted
-def is_new_abort_task_found(owner: str, repo: str, previous_server_status, error_task_dict_list: list):
-    """
-    是否发现新的出错任务
-
-    问题：
-        如果大量作业出错，可能会导致发送大量警报
-    :param owner:
-    :param repo:
-    :param previous_server_status:
-    :param error_task_dict_list:
-    :return:
-    """
-
-    new_error_task_found = True
-
-    if previous_server_status == 'abo' or previous_server_status == NodeStatus.Aborted:
-        new_error_task_found = False
-        cached_error_task_value = data_store.get_error_task_list_from_cache(owner, repo)
-        cached_error_task_name_list = [a_task_item['path'] for a_task_item in
-                                       cached_error_task_value['error_task_list'] ]
-        for a_task in error_task_dict_list:
-            if a_task['path'] not in cached_error_task_name_list:
-                new_error_task_found = True
-                break
-
-    return new_error_task_found
 
 
 def sms_status_message_handler(message_data: dict) -> None:
@@ -71,13 +42,10 @@ def sms_status_message_handler(message_data: dict) -> None:
     bunch_dict = message_data['status']
     message_datetime = datetime.datetime.strptime(message_time, "%Y-%m-%dT%H:%M:%S.%f")
 
-    warn_user_list = data_store.get_ding_talk_warn_user_list(owner, repo)
+    # warn_user_list = data_store.get_ding_talk_warn_user_list(owner, repo)
 
-    sms_server_key = "{owner}/{repo}/status".format(owner=owner, repo=repo)
-    print(sms_server_key)
-
-    takler_object_system_store_flag = False
-    takler_object_system_dict = None
+    nmp_model_system_store_flag = False
+    nmp_model_system_dict = None
 
     if len(bunch_dict) > 0:
         print('building bunch from message...')
@@ -118,15 +86,15 @@ def sms_status_message_handler(message_data: dict) -> None:
 
                 # if True:
                 if is_new_abort_task_found(owner, repo, previous_server_status, error_task_dict_list):
-                    takler_object_system_dict = data_store.save_server_status_to_nmp_model_system(
+                    nmp_model_system_dict = data_store.save_server_status_to_nmp_model_system(
                         owner, repo, sms_name,
                         message_data, error_task_dict_list
                     )
 
-                    takler_object_system_store_flag = True
+                    nmp_model_system_store_flag = True
 
                     aborted_tasks_blob_id = None
-                    for a_blob in takler_object_system_dict['blobs']:
+                    for a_blob in nmp_model_system_dict['blobs']:
                         if a_blob['data']['type'] == 'aborted_tasks':
                             aborted_tasks_blob_id = a_blob['id']
 
@@ -166,16 +134,16 @@ def sms_status_message_handler(message_data: dict) -> None:
             owner=owner,
             repo=repo
         )
-        if takler_object_system_store_flag:
+        if nmp_model_system_store_flag:
             post_message = {
                 'app': 'nmp_broker',
                 'event': 'post_sms_status',
                 'timestamp': datetime.datetime.utcnow(),
                 'data': {
                     'type': 'takler_object',
-                    'blobs': takler_object_system_dict['blobs'],
-                    'trees': takler_object_system_dict['trees'],
-                    'commits': takler_object_system_dict['commits']
+                    'blobs': nmp_model_system_dict['blobs'],
+                    'trees': nmp_model_system_dict['trees'],
+                    'commits': nmp_model_system_dict['commits']
                 }
             }
 
