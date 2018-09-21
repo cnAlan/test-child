@@ -4,6 +4,9 @@ from flask import json
 from nmp_broker.common.database import redis_client
 
 # redis
+# access token
+
+
 dingtalk_access_token_key = "dingtalk_access_token"
 
 
@@ -34,13 +37,15 @@ def save_weixin_access_token_to_cache(access_token: str) -> None:
     return
 
 
+# workflow error task list
+
 def get_error_task_list_from_cache(owner: str, repo: str)-> dict:
-    error_task_key = "{owner}/{repo}/sms/task/error".format(owner=owner, repo=repo)
+    error_task_key = "{owner}/{repo}/workflow/task/error".format(owner=owner, repo=repo)
     cached_error_task_value = json.loads(redis_client.get(error_task_key).decode())
     return cached_error_task_value
 
 
 def save_error_task_list_to_cache(owner: str, repo: str, error_task_value: dict)->None:
-    error_task_key = "{owner}/{repo}/sms/task/error".format(owner=owner, repo=repo)
+    error_task_key = "{owner}/{repo}/sms/workflow/error".format(owner=owner, repo=repo)
     redis_client.set(error_task_key, json.dumps(error_task_value))
     return

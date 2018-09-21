@@ -38,8 +38,6 @@ def save_server_status_to_nmp_model_system(
         )
     )
     status_blob.save()
-    # blobs_collection = nwpc_monitor_platform_mongodb.blobs
-    # blobs_collection.insert_one(status_blob.to_dict())
 
     from nmp_model.mongodb.blobs.aborted_tasks import AbortedTasksContent, AbortedTasksBlobData, AbortedTasksBlob
     aborted_tasks_blob = AbortedTasksBlob(
@@ -206,22 +204,6 @@ def save_task_check_to_nmp_model_system(
     )
     tree_object.save()
 
-    # tree_object.id = get_new_64bit_ticket()
-    # tree_object.owner = owner
-    # tree_object.repo = repo
-    # tree_object_data = {
-    #     'nodes': [
-    #         {
-    #             'type': 'unfit_tasks',
-    #             'name': 'sms_check_task_unfit_nodes',
-    #             'blob_ticket_id': unfit_nodes_blob.id
-    #         }
-    #     ]
-    # }
-    # tree_object.set_data(tree_object_data)
-    # trees_collection = nwpc_monitor_platform_mongodb.trees
-    # trees_collection.insert_one(tree_object.to_dict())
-
     commit_object = Commit(
         ticket_id=get_new_64bit_ticket(),
         owner=owner,
@@ -234,20 +216,7 @@ def save_task_check_to_nmp_model_system(
         )
     )
     commit_object.save()
-
-    # commit_object.id = get_new_64bit_ticket()
-    # commit_object.owner = owner
-    # commit_object.repo = repo
-    # commit_object_data = {
-    #     'committer': 'broker',
-    #     'type': 'task_check',
-    #     'tree_ticket_id': tree_object.id,
-    #     'committed_time': datetime.datetime.utcnow()
-    # }
-    # commit_object.set_data(commit_object_data)
-    # commits_collection = nwpc_monitor_platform_mongodb.commits
-    # commits_collection.insert_one(commit_object.to_dict())
-
+    
     return {
         'blobs': [
             unfit_nodes_blob.to_dict()

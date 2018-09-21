@@ -43,13 +43,10 @@ def ecflow_status_message_handler(message_data: dict) -> None:
     bunch_dict = message_data['status']
     message_datetime = datetime.datetime.strptime(message_time, "%Y-%m-%dT%H:%M:%S.%f")
 
-    warn_user_list = data_store.get_ding_talk_warn_user_list(owner, repo)
+    # warn_user_list = data_store.get_ding_talk_warn_user_list(owner, repo)
 
-    sms_server_key = "{owner}/{repo}/status".format(owner=owner, repo=repo)
-    print(sms_server_key)
-
-    takler_object_system_store_flag = False
-    takler_object_system_dict = None
+    nmp_model_system_store_flag = False
+    nmp_model_system_dict = None
 
     if len(bunch_dict) > 0:
         print('building bunch from message...')
@@ -79,33 +76,33 @@ def ecflow_status_message_handler(message_data: dict) -> None:
         server_status = bunch.status
 
         if server_status == NodeStatus.aborted:
-            cached_sms_server_status = data_store.get_server_status_from_cache(owner, repo, ecflow_name)
+            cached_sms_server_status = data_store.mongodb.workflow.get_server_status_from_cache(owner, repo, ecflow_name)
             if cached_sms_server_status is not None:
 
                 print('building bunch from cache message...')
-                cached_bunch = Bunch.create_from_dict(cached_sms_server_status['status'])
+                cached_bunch = Bunch.create_from_dict(cached_sms_server_status['data']['status'])
                 print('building bunch from cache message...Done')
 
                 previous_server_status = cached_bunch.status
 
-                #if True:
-                if is_new_abort_task_found(owner, repo, previous_server_status, error_task_dict_list):
-                    takler_object_system_dict = data_store.save_server_status_to_nmp_model_system(
+                if True:
+                # if is_new_abort_task_found(owner, repo, previous_server_status, error_task_dict_list):
+                    nmp_model_system_dict = data_store.save_server_status_to_nmp_model_system(
                         owner, repo, ecflow_name,
                         message_data, error_task_dict_list
                     )
 
-                    takler_object_system_store_flag = True
+                    nmp_model_system_store_flag = True
 
                     aborted_tasks_blob_id = None
-                    for a_blob in takler_object_system_dict['blobs']:
+                    for a_blob in nmp_model_system_dict['blobs']:
                         if a_blob['data']['type'] == 'aborted_tasks':
                             aborted_tasks_blob_id = a_blob['id']
 
                     warning_data = {
                         'owner': owner,
                         'repo': repo,
-                        'sms_server_name': ecflow_name,  # bunch.name
+                        'server_name': ecflow_name,  # bunch.name
                         'message_datetime': message_datetime,
                         'suite_error_map': suite_error_map,
                         'aborted_tasks_blob_id': aborted_tasks_blob_id
@@ -129,25 +126,25 @@ def ecflow_status_message_handler(message_data: dict) -> None:
             'timestamp': datetime.datetime.utcnow(),
             'error_task_list': error_task_dict_list
         }
-        data_store.save_error_task_list_to_cache(owner, repo, error_task_value)
+        data_store.redis.save_error_task_list_to_cache(owner, repo, error_task_value)
 
-        data_store.save_server_status_to_cache(owner, repo, ecflow_name, message_data)
+        data_store.mongodb.workflow.save_server_status_to_cache(owner, repo, ecflow_name, message_data)
 
         # 发送给外网服务器
         website_url = current_app.config['BROKER_CONFIG']['cloud']['put']['url'].format(
             owner=owner,
             repo=repo
         )
-        if takler_object_system_store_flag:
+        if nmp_model_system_store_flag:
             post_message = {
                 'app': 'nmp_broker',
                 'event': 'post_ecflow_status',
                 'timestamp': datetime.datetime.utcnow(),
                 'data': {
                     'type': 'takler_object',
-                    'blobs': takler_object_system_dict['blobs'],
-                    'trees': takler_object_system_dict['trees'],
-                    'commits': takler_object_system_dict['commits']
+                    'blobs': nmp_model_system_dict['blobs'],
+                    'trees': nmp_model_system_dict['trees'],
+                    'commits': nmp_model_system_dict['commits']
                 }
             }
 

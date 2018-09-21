@@ -91,7 +91,7 @@ class WeixinApp(object):
                 "fields": [
                     {"name": "owner", type: "string"},
                     {"name": "repo", type: "string"},
-                    {"name": "sms_server_name", type: "string"},
+                    {"name": "server_name", type: "string"},
                     {"name": "message_datetime", type: "datetime"},
                     {"name": "suite_error_map", type: "array"},
                     {"name": "aborted_tasks_blob_id", type: "int"},
@@ -99,7 +99,7 @@ class WeixinApp(object):
             }
         :return:
         """
-        # TODO: change sms_server_name
+        # TODO: change server_name
         print('Get new error task. Pushing warning message to weixin...')
 
         auth = Auth(self.weixin_config['token'])
@@ -133,7 +133,7 @@ class WeixinApp(object):
 
         articles = [
             {
-                "title": "业务系统：{sms_server_name}运行出错".format(sms_server_name=warning_data['sms_server_name']),
+                "title": "业务系统：{server_name}运行出错".format(server_name=warning_data['server_name']),
                 "picurl": "http://wx2.sinaimg.cn/large/4afdac38ly1feu4tqm9c6j21kw0sggmu.jpg",
                 "url": message_url
             },
@@ -161,8 +161,8 @@ class WeixinApp(object):
                 "url": message_url
             }
         ]
-        to_user = "@all"
-        #to_user = "wangdp"
+        # to_user = "@all"
+        to_user = "wangdp"
         warning_post_message = {
             "touser": to_user,
             "agentid": 2,

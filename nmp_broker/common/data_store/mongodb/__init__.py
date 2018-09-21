@@ -2,7 +2,7 @@
 import datetime
 # from nmp_broker.common.database import mongodb_client
 from .workflow import *
-from .batch import *
+from .workload import *
 
 # mongodb
 # nwpc_monitor_platform_mongodb = mongodb_client.nwpc_monitor_platform_develop
