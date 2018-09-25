@@ -164,7 +164,7 @@ def handle_status_message(message_data: dict) -> None:
 
     print('gzip the data...')
     gzipped_post_data = gzip.compress(bytes(json.dumps(website_post_data), 'utf-8'))
-    print('gzip the data...done')
+    print('gzip the data...dne')
 
     response = requests.post(
         website_url,

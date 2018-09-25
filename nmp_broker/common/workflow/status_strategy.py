@@ -3,7 +3,7 @@
 from nmp_broker.common import data_store
 
 
-def is_new_abort_task_found(owner: str, repo: str, previous_server_status, error_task_dict_list:list):
+def is_new_abort_task_found(owner: str, repo: str, previous_server_status, error_task_dict_list: list):
     """
     是否发现新的出错任务
 

@@ -6,7 +6,6 @@ from flask import request, jsonify, json
 
 from nmp_broker.api_v3 import api_v3_app
 
-from nmp_broker.common.workflow.sms import sms_status_message_handler
 from nmp_broker.common.workflow.message_handler import handle_status_message
 
 
@@ -70,10 +69,7 @@ def receive_workflow_status_message(owner, repo):
 
     message_app = message['app']
     message_type = message['type']
-    if message_app == 'sms_status_collector':
-        message_data = message['data']
-        sms_status_message_handler(message_data)
-    elif message_app == 'ecflow_status_collector':
+    if message_app == 'sms_status_collector' or 'ecflow_status_collector':
         message_data = message['data']
         handle_status_message(message_data)
     else:
