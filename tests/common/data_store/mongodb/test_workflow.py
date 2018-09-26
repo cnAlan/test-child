@@ -1,6 +1,11 @@
 # coding: utf-8
 from datetime import datetime
 
+from nmp_model.mongodb.blobs.status import StatusBlob
+from nmp_model.mongodb.blobs.aborted_tasks import AbortedTasksBlob
+from nmp_model.mongodb.tree import Tree
+from nmp_model.mongodb.commit import Commit
+
 
 def test_save_server_status(app):
     with app.app_context():
@@ -52,20 +57,24 @@ def test_save_server_status(app):
 
         # check blobs
         status_blob = blobs[0]
+        assert isinstance(status_blob, StatusBlob)
         aborted_tasks_blob = blobs[1]
-        assert aborted_tasks_blob['data']['content']['status_blob_ticket_id'] == status_blob['ticket_id']
+        assert isinstance(aborted_tasks_blob, AbortedTasksBlob)
+        assert aborted_tasks_blob.data.content.status_blob_ticket_id == status_blob['ticket_id']
 
         # check trees
         tree = trees[0]
-        tree_nodes = tree['data']['nodes']
+        assert isinstance(tree, Tree)
+        tree_nodes = tree.data.nodes
         status_node = tree_nodes[0]
-        assert status_node['blob_ticket_id'] == status_blob['ticket_id']
+        assert status_node.blob_ticket_id == status_blob.ticket_id
         aborted_tasks_node = tree_nodes[1]
-        assert aborted_tasks_node['blob_ticket_id'] == aborted_tasks_blob['ticket_id']
+        assert aborted_tasks_node.blob_ticket_id == aborted_tasks_blob.ticket_id
 
         # check commits
         commit = commits[0]
-        assert commit['data']['tree_ticket_id'] == tree['ticket_id']
+        assert isinstance(commit, Commit)
+        assert commit.data.tree_ticket_id == tree.ticket_id
 
 
 def test_save_tasks_check(app):
@@ -137,10 +146,10 @@ def test_save_tasks_check(app):
 
         # check trees
         tree = trees[0]
-        tree_nodes = tree['data']['nodes']
+        tree_nodes = tree.data.nodes
         unfit_tasks_node = tree_nodes[0]
-        assert unfit_tasks_node['blob_ticket_id'] == unfit_node_blob['ticket_id']
+        assert unfit_tasks_node.blob_ticket_id == unfit_node_blob.ticket_id
 
         # check commits
         commit = commits[0]
-        assert commit['data']['tree_ticket_id'] == tree['ticket_id']
+        assert commit.data.tree_ticket_id == tree.ticket_id

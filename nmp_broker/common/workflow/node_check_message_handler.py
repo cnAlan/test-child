@@ -111,13 +111,13 @@ def handle_node_check_message(owner, repo, message_data: dict) -> None:
             }
         }
 
-        takler_object_system_dict = data_store.save_task_check_to_nmp_model_system(
+        nmp_model_results = data_store.save_task_check_to_nmp_model_system(
             owner, repo,
             message_data, unfit_node_list
         )
 
         unfit_nodes_blob_id = None
-        for a_blob in takler_object_system_dict['blobs']:
+        for a_blob in nmp_model_results['blobs']:
             if isinstance(a_blob, UnfitNodesBlob):
                 unfit_nodes_blob_id = a_blob.ticket_id
                 weixin_message['data']['unfit_nodes_blob_id'] = unfit_nodes_blob_id
@@ -129,9 +129,9 @@ def handle_node_check_message(owner, repo, message_data: dict) -> None:
             'timestamp': datetime.datetime.utcnow(),
             'data': {
                 'type': 'takler_object',
-                'blobs': [blob.to_mongo().to_dict() for blob in takler_object_system_dict['blobs']],
-                'trees': [blob.to_mongo().to_dict() for blob in takler_object_system_dict['trees']],
-                'commits': [blob.to_mongo().to_dict() for blob in takler_object_system_dict['commits']],
+                'blobs': [blob.to_mongo().to_dict() for blob in nmp_model_results['blobs']],
+                'trees': [blob.to_mongo().to_dict() for blob in nmp_model_results['trees']],
+                'commits': [blob.to_mongo().to_dict() for blob in nmp_model_results['commits']],
             }
         }
 

@@ -6,6 +6,7 @@ import gzip
 import requests
 from flask import json, current_app
 
+from nmp_model.mongodb.blobs.aborted_tasks import AbortedTasksBlob
 from nmp_broker.common import weixin, data_store
 from nwpc_workflow_model.ecflow import Bunch, ErrorStatusTaskVisitor, pre_order_travel, NodeStatus
 
@@ -95,8 +96,8 @@ def handle_status_message(message_data: dict) -> None:
 
                 aborted_tasks_blob_id = None
                 for a_blob in nmp_model_system_dict['blobs']:
-                    if a_blob['data']['type'] == 'aborted_tasks':
-                        aborted_tasks_blob_id = a_blob['id']
+                    if isinstance(a_blob, AbortedTasksBlob):
+                        aborted_tasks_blob_id = a_blob.ticket_id
 
                 warning_data = {
                     'owner': owner,
@@ -141,9 +142,9 @@ def handle_status_message(message_data: dict) -> None:
             'timestamp': datetime.datetime.utcnow(),
             'data': {
                 'type': 'takler_object',
-                'blobs': nmp_model_system_dict['blobs'],
-                'trees': nmp_model_system_dict['trees'],
-                'commits': nmp_model_system_dict['commits']
+                'blobs': [blob.to_mongo().to_dict() for blob in nmp_model_system_dict['blobs']],
+                'trees': [blob.to_mongo().to_dict() for blob in nmp_model_system_dict['trees']],
+                'commits': [blob.to_mongo().to_dict() for blob in nmp_model_system_dict['commits']],
             }
         }
 

@@ -123,14 +123,14 @@ def save_server_status_to_nmp_model_system(
 
     return {
         'blobs': [
-            status_blob.to_dict(),
-            aborted_tasks_blob.to_dict()
+            status_blob,
+            aborted_tasks_blob
         ],
         'trees': [
-            tree_object.to_dict()
+            tree_object
         ],
         'commits': [
-            commit_object.to_dict()
+            commit_object
         ]
     }
 
