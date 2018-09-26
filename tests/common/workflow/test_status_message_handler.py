@@ -3,7 +3,7 @@ import pytest
 
 
 def test_handle_ecflow_status_method(app):
-    from nmp_broker.common.workflow.message_handler import handle_status_message
+    from nmp_broker.common.workflow.status_message_handler import handle_status_message
     with app.app_context():
         message_data = {
             'owner': 'nwp_xp',
@@ -67,7 +67,7 @@ def test_handle_ecflow_status_method(app):
 
 
 def test_handle_sms_status_method(app):
-    from nmp_broker.common.workflow.message_handler import handle_status_message
+    from nmp_broker.common.workflow.status_message_handler import handle_status_message
     with app.app_context():
         message_data = {
             "owner": "nwp_xp",

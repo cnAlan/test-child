@@ -219,13 +219,13 @@ def save_task_check_to_nmp_model_system(
     
     return {
         'blobs': [
-            unfit_nodes_blob.to_dict()
+            unfit_nodes_blob
         ],
         'trees': [
-            tree_object.to_dict()
+            tree_object
         ],
         'commits': [
-            commit_object.to_dict()
+            commit_object
         ]
     }
 

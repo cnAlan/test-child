@@ -6,7 +6,7 @@ from flask import request, jsonify, json
 
 from nmp_broker.api_v3 import api_v3_app
 
-from nmp_broker.common.workflow.message_handler import handle_status_message
+from nmp_broker.common.workflow.status_message_handler import handle_status_message
 
 
 @api_v3_app.route('/workflow/repos/<owner>/<repo>/status', methods=['POST'])

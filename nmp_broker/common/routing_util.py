@@ -3,6 +3,7 @@ from datetime import datetime, time, timedelta, date
 
 from flask.json import JSONEncoder
 from werkzeug.routing import BaseConverter, ValidationError
+from bson import ObjectId
 
 
 class NMPBrokerApiJSONEncoder(JSONEncoder):
@@ -15,6 +16,8 @@ class NMPBrokerApiJSONEncoder(JSONEncoder):
             return obj.strftime('%H:%M:%S')
         elif isinstance(obj, timedelta):
             return {'day': obj.days, 'seconds': obj.seconds}
+        elif isinstance(obj, ObjectId):
+            return str(obj)
         return JSONEncoder.default(self, obj)
 
 

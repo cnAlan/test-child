@@ -1,108 +1,78 @@
-# coding=utf-8
-
+# coding: utf-8
 import datetime
 import gzip
 
 import requests
-from flask import request, jsonify, json, current_app
+from flask import current_app, json
 
-from nmp_broker.api_v2 import api_v2_app
 from nmp_broker.common import weixin, data_store
 
-from nmp_broker.common.workflow.status_message_handler import handle_status_message
+from nmp_model.mongodb.blobs.unfit_nodes import UnfitNodesBlob
+
 
 REQUEST_POST_TIME_OUT = 20
 
 
-@api_v2_app.route('/hpc/sms/status', methods=['POST'])
-def receive_sms_status_message():
+def handle_node_check_message(owner, repo, message_data: dict) -> None:
     """
-    接收外部发送来的 SMS 服务器的状态，将其保存到本地缓存，并发送到外网服务器
-    :return:
-    """
-    start_time = datetime.datetime.utcnow()
 
-    content_encoding = request.headers.get('content-encoding', '').lower()
-    if content_encoding == 'gzip':
-        gzipped_data = request.data
-        data_string = gzip.decompress(gzipped_data)
-        body = json.loads(data_string.decode('utf-8'))
-    else:
-        body = request.form
-
-    message = json.loads(body['message'])
-
-    if 'error' in message:
-        result = {
-            'status': 'ok'
-        }
-        return jsonify(result)
-
-    message_data = message['data']
-    handle_status_message(message_data)
-
-    result = {
-        'status': 'ok'
-    }
-    end_time = datetime.datetime.utcnow()
-    print(end_time - start_time)
-
-    return jsonify(result)
-
-
-@api_v2_app.route('/hpc/sms/<owner>/<repo>/task-check', methods=['POST'])
-def receive_sms_node_task_message(owner, repo):
-    """
-    
-    :param owner: 
-    :param repo: 
-    :return: 
-    
-    post data:
-    message:
+    :param owner: owner name
+    :param repo: repo name
+    :param message_data: a dict of message data.
     {
-        'app': 'nwpc_monitor_task_scheduler',
-        'type': 'sms_node_task',
-        'timestamp': datetime.datetime.utcnow().isoformat(),
-        'data': {
-            'owner': args['owner'],
-            'repo': args['repo'],
-            'request': {
-                'task': args['task'],
-            },
-            'response': {
-                'nodes': [
+        'owner': owner,
+        'repo': repo,
+        'request': {
+            'task': {
+                'name': 'grapes_meso_post',
+                'type': 'sms-node',
+                'trigger': [
                     {
-                        'node_path': node path,
-                        'check_list_result': [
+                        'type': 'time',
+                        'time': '11:35:00'
+                    }
+                ],
+                "nodes": [
+                    {
+                        'node_path': '/grapes_meso_post',
+                        'check_list': [
                             {
-                                "is_condition_fit": false,
-                                "type": "variable",
-                                "name": "SMSDATE",
-                                "value": {
-                                    "expected_value": "20170522",
-                                    "value": "20170401"
+                                'type': 'variable',
+                                'name': 'SMSDATE',
+                                'value': {
+                                    'type': 'date',
+                                    'operator': 'equal',
+                                    'fields': 'current'
+                                }
+                            },
+                            {
+                                'type': 'status',
+                                'value': {
+                                    'operator': 'in',
+                                    'fields': [
+                                        "submitted",
+                                        "active",
+                                        "complete"
+                                    ]
                                 }
                             }
-                        
                         ]
-                    },
-                    ...
+                    }
                 ]
-            }
+            },
+        },
+        'response': {
+            'nodes':[
+                {
+                    'node_path': node_path,
+                    'check_list_result': array, see check_sms_node
+                },
+                ...
+            ]
         }
     }
+    :return:
     """
-    content_encoding = request.headers.get('content-encoding', '').lower()
-    if content_encoding == 'gzip':
-        gzipped_data = request.data
-        data_string = gzip.decompress(gzipped_data)
-        body = json.loads(data_string.decode('utf-8'))
-    else:
-        body = request.form
-
-    message = json.loads(body['message'])
-    message_data = message['data']
     task_name = message_data['request']['task']['name']
 
     unfit_node_list = []
@@ -148,8 +118,8 @@ def receive_sms_node_task_message(owner, repo):
 
         unfit_nodes_blob_id = None
         for a_blob in takler_object_system_dict['blobs']:
-            if a_blob['data']['type'] == 'unfit_nodes':
-                unfit_nodes_blob_id = a_blob['id']
+            if isinstance(a_blob, UnfitNodesBlob):
+                unfit_nodes_blob_id = a_blob.ticket_id
                 weixin_message['data']['unfit_nodes_blob_id'] = unfit_nodes_blob_id
         print(unfit_nodes_blob_id)
 
@@ -159,9 +129,9 @@ def receive_sms_node_task_message(owner, repo):
             'timestamp': datetime.datetime.utcnow(),
             'data': {
                 'type': 'takler_object',
-                'blobs': takler_object_system_dict['blobs'],
-                'trees': takler_object_system_dict['trees'],
-                'commits': takler_object_system_dict['commits']
+                'blobs': [blob.to_mongo().to_dict() for blob in takler_object_system_dict['blobs']],
+                'trees': [blob.to_mongo().to_dict() for blob in takler_object_system_dict['trees']],
+                'commits': [blob.to_mongo().to_dict() for blob in takler_object_system_dict['commits']],
             }
         }
 
@@ -187,11 +157,12 @@ def receive_sms_node_task_message(owner, repo):
         )
         print(response)
 
-        weixin_app = weixin.WeixinApp(
-            weixin_config=current_app.config['BROKER_CONFIG']['weixin_app'],
-            cloud_config=current_app.config['BROKER_CONFIG']['cloud']
-        )
-        weixin_app.send_sms_node_task_warn(weixin_message)
+        # weixin_app = weixin.WeixinApp(
+        #     weixin_config=current_app.config['BROKER_CONFIG']['weixin_app'],
+        #     cloud_config=current_app.config['BROKER_CONFIG']['cloud']
+        # )
+        # weixin_app.send_sms_node_task_warn(weixin_message)
+
     # else:
     #     # debug message.
     #     weixin_message = {
@@ -210,8 +181,3 @@ def receive_sms_node_task_message(owner, repo):
     #         cloud_config=app.config['BROKER_CONFIG']['cloud']
     #     )
     #     weixin_app.send_sms_node_task_message(weixin_message)
-
-    response_result = {
-        'status': 'ok'
-    }
-    return jsonify(response_result)
