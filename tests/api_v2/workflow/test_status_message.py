@@ -5,6 +5,7 @@ def test_ecflow_status_message(app):
     from flask import json
     client = app.test_client()
     message = {
+        'app': 'ecflow_status_collector',
         'data': {
             'owner': 'nwp_xp',
             'repo': 'nwpc_op',
@@ -75,6 +76,7 @@ def test_sms_status_message(app):
     from flask import json
     client = app.test_client()
     message = {
+        'app': 'sms_status_collector',
         'data': {
             "owner": "nwp_xp",
             "repo": "nwpc_pd",
