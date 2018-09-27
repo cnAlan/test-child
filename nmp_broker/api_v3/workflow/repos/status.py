@@ -5,47 +5,28 @@ import gzip
 from flask import request, jsonify, json
 
 from nmp_broker.api_v3 import api_v3_app
-
 from nmp_broker.common.workflow.status_message_handler import handle_status_message
 
 
 @api_v3_app.route('/workflow/repos/<owner>/<repo>/status', methods=['POST'])
 def receive_workflow_status_message(owner, repo):
     """
-    receive status of workflow server, store into local cache and then post it to remote web server.
+    receive status of workflow server, and send to status message handler.
+    store into local cache and then post it to remote web server.
 
     POST data
 
-    message: a JSON string. There are some different types of message:
-    sms
+    message: a JSON string. Schema:
     {
-        'app': 'sms_status_collector',
-        'type': 'sms_status',
+        'app': 'sms_status_collector' or 'ecflow_status_collector',
         'timestamp': current_time,
         'data': {
             'owner': owner,
             'repo': repo,
-            'sms_name': sms_name,
-            'sms_user': sms_user,
             'time': current_time,
             'status': bunch_dict
         }
     }
-
-    ecflow
-    {
-        'app': 'ecflow_status_collector',
-        'type': 'ecflow_status',
-        'timestamp': current_time,
-        'data': {
-            'owner': owner,
-            'repo': repo,
-            'server_name': server_name  # should removed
-            'time': current_time,
-            'status': bunch_dict
-        }
-    }
-
 
     :return:
     """
@@ -63,13 +44,13 @@ def receive_workflow_status_message(owner, repo):
 
     if 'error' in message:
         result = {
-            'status': 'ok'
+            'status': 'error',
+            'message': message['error']
         }
         return jsonify(result)
 
     message_app = message['app']
-    message_type = message['type']
-    if message_app == 'sms_status_collector' or 'ecflow_status_collector':
+    if message_app == 'sms_status_collector' or message_app == 'ecflow_status_collector':
         message_data = message['data']
         handle_status_message(message_data)
     else:
