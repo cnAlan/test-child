@@ -15,16 +15,15 @@ from nmp_broker.common.workflow.status_strategy import is_new_abort_task_found, 
 REQUEST_POST_TIME_OUT = 20
 
 
-def handle_status_message(message_data: dict) -> None:
+def handle_status_message(owner: str, repo: str, message_data: dict) -> None:
     """
     message_data:
     {
         "name": "ecflow_status_message_data",
         "type": "record",
         "fields": [
-            {"name": "owner", "type": "string"},
-            {"name": "repo", "type": "string"},
             {"name": "time", "type": "string"},
+            {"name": "server_name", "type": "
             {
                 "name": "status",
                 "doc": "bunch status",
@@ -33,9 +32,7 @@ def handle_status_message(message_data: dict) -> None:
         ]
     }
     """
-    owner = message_data['owner']
-    repo = message_data['repo']
-    ecflow_name = message_data['repo']
+    server_name = message_data['server_name']
     message_time = message_data['time']
 
     bunch_dict = message_data['status']
@@ -76,7 +73,7 @@ def handle_status_message(message_data: dict) -> None:
     server_status = bunch.status
 
     if server_status == NodeStatus.aborted:
-        cached_sms_server_status = data_store.mongodb.workflow.get_server_status_from_cache(owner, repo, ecflow_name)
+        cached_sms_server_status = data_store.mongodb.workflow.get_server_status_from_cache(owner, repo, server_name)
         if cached_sms_server_status is not None:
 
             print('building bunch from cache message...')
@@ -88,7 +85,7 @@ def handle_status_message(message_data: dict) -> None:
             if True:
             # if is_new_abort_task_found(owner, repo, previous_server_status, error_task_dict_list):
                 nmp_model_system_dict = data_store.save_server_status_to_nmp_model_system(
-                    owner, repo, ecflow_name,
+                    owner, repo, server_name,
                     message_data, error_task_dict_list
                 )
 
@@ -102,7 +99,7 @@ def handle_status_message(message_data: dict) -> None:
                 warning_data = {
                     'owner': owner,
                     'repo': repo,
-                    'server_name': ecflow_name,  # bunch.name
+                    'server_name': server_name,  # bunch.name
                     'message_datetime': message_datetime,
                     'suite_error_map': suite_error_map,
                     'aborted_tasks_blob_id': aborted_tasks_blob_id
@@ -128,7 +125,7 @@ def handle_status_message(message_data: dict) -> None:
     }
     data_store.redis.save_error_task_list_to_cache(owner, repo, error_task_value)
 
-    data_store.mongodb.workflow.save_server_status_to_cache(owner, repo, ecflow_name, message_data)
+    data_store.mongodb.workflow.save_server_status_to_cache(owner, repo, server_name, message_data)
 
     # 发送给外网服务器
     website_url = current_app.config['BROKER_CONFIG']['cloud']['put']['url'].format(

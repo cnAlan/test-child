@@ -47,7 +47,9 @@ def receive_workflow_status_message():
         return jsonify(result)
 
     message_data = message['data']
-    handle_status_message(message_data)
+    owner = message_data['owner']
+    repo = message_data['repo']
+    handle_status_message(owner, repo, message_data)
 
     result = {
         'status': 'ok'

@@ -5,10 +5,11 @@ import pytest
 def test_handle_ecflow_status_method(app):
     from nmp_broker.common.workflow.status_message_handler import handle_status_message
     with app.app_context():
+        owner = 'nwp_xp'
+        repo = 'nwpc_op'
         message_data = {
-            'owner': 'nwp_xp',
-            'repo': 'nwpc_op',
             'time': '2018-09-21T15:20:59.667581',
+            'server_name': 'nwpc_op',
             'status': {
                 "name": "",
                 "node_type": "root",
@@ -63,18 +64,17 @@ def test_handle_ecflow_status_method(app):
             }
         }
 
-        handle_status_message(message_data)
+        handle_status_message(owner, repo, message_data)
 
 
 def test_handle_sms_status_method(app):
     from nmp_broker.common.workflow.status_message_handler import handle_status_message
     with app.app_context():
+        owner = 'nwp_xp'
+        repo = 'nwpc_pd'
         message_data = {
-            "owner": "nwp_xp",
-            "repo": "nwpc_pd",
-            "sms_name": "nwpc_op",
-            "sms_user": "nwp_xp",
             "time": "2018-09-21T16:47:57.794964",
+            "server_name": 'nwpc_pd',
             "status": {
                 "name": "nwpc_op",
                 "children": [
@@ -467,4 +467,4 @@ def test_handle_sms_status_method(app):
             }
         }
 
-        handle_status_message(message_data)
+        handle_status_message(owner, repo, message_data)

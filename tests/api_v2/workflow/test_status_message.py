@@ -10,6 +10,7 @@ def test_ecflow_status_message(app):
             'owner': 'nwp_xp',
             'repo': 'nwpc_op',
             'time': '2018-09-21T15:20:59.667581',
+            'server_name': 'nwpc_op',
             'status': {
                 "name": "",
                 "node_type": "root",
@@ -80,8 +81,7 @@ def test_sms_status_message(app):
         'data': {
             "owner": "nwp_xp",
             "repo": "nwpc_pd",
-            "sms_name": "nwpc_op",
-            "sms_user": "nwp_xp",
+            "server_name": 'nwpc_pd',
             "time": "2018-09-21T16:47:57.794964",
             "status": {
                 "name": "nwpc_op",

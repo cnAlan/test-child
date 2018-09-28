@@ -9,8 +9,7 @@ def test_ecflow_status_message(app):
     message = {
         'app': 'ecflow_status_collector',
         'data': {
-            'owner': owner,
-            'repo': repo,
+            'server_name': 'nwpc_op',
             'time': '2018-09-21T15:20:59.667581',
             'status': {
                 "name": "",
@@ -84,10 +83,7 @@ def test_sms_status_message(app):
     message = {
         'app': 'sms_status_collector',
         'data': {
-            "owner": owner,
-            "repo": repo,
-            "sms_name": "nwpc_op",
-            "sms_user": "nwp_xp",
+            'server_name': 'nwpc_pd',
             "time": "2018-09-21T16:47:57.794964",
             "status": {
                 "name": "nwpc_op",

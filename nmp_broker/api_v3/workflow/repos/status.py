@@ -21,8 +21,6 @@ def receive_workflow_status_message(owner, repo):
         'app': 'sms_status_collector' or 'ecflow_status_collector',
         'timestamp': current_time,
         'data': {
-            'owner': owner,
-            'repo': repo,
             'time': current_time,
             'status': bunch_dict
         }
@@ -52,7 +50,7 @@ def receive_workflow_status_message(owner, repo):
     message_app = message['app']
     if message_app == 'sms_status_collector' or message_app == 'ecflow_status_collector':
         message_data = message['data']
-        handle_status_message(message_data)
+        handle_status_message(owner, repo, message_data)
     else:
         print("message app is unknown", message_app)
         result = {
