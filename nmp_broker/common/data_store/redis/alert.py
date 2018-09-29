@@ -1,11 +1,5 @@
 # coding: utf-8
-from flask import json
-
 from nmp_broker.common.database import redis_client
-
-# redis
-# access token
-
 
 dingtalk_access_token_key = "dingtalk_access_token"
 
@@ -34,21 +28,4 @@ def get_weixin_access_token_from_cache() -> str or None:
 
 def save_weixin_access_token_to_cache(access_token: str) -> None:
     redis_client.set(weixin_access_token_key, access_token)
-    return
-
-
-# workflow error task list
-
-def get_error_task_list_from_cache(owner: str, repo: str)-> dict or None:
-    error_task_key = "{owner}/{repo}/workflow/task/error".format(owner=owner, repo=repo)
-    value = redis_client.get(error_task_key)
-    if value is None:
-        return None
-    cached_error_task_value = json.loads(value.decode())
-    return cached_error_task_value
-
-
-def save_error_task_list_to_cache(owner: str, repo: str, error_task_value: dict)->None:
-    error_task_key = "{owner}/{repo}/sms/workflow/error".format(owner=owner, repo=repo)
-    redis_client.set(error_task_key, json.dumps(error_task_value))
     return

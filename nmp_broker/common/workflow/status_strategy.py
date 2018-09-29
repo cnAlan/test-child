@@ -25,7 +25,7 @@ def is_new_abort_task_found(owner: str, repo: str, previous_server_status, error
     if is_server_status_aborted(previous_server_status):
         new_error_task_found = False
         from nmp_broker.common import data_store
-        cached_error_task_value = data_store.get_error_task_list_from_cache(owner, repo)
+        cached_error_task_value = data_store.redis.workflow.get_error_task_list_from_cache(owner, repo)
         if cached_error_task_value is None:
             return True
         cached_error_task_name_list = [a_task_item['path'] for a_task_item in

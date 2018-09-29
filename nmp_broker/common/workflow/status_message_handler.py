@@ -7,7 +7,9 @@ import requests
 from flask import json, current_app
 
 from nmp_model.mongodb.blobs.aborted_tasks import AbortedTasksBlob
-from nmp_broker.common import weixin, data_store
+from nmp_broker.common import weixin
+from nmp_broker.common.data_store.redis import workflow as redis_workflow
+from nmp_broker.common.data_store.mongodb import workflow as mongodb_workflow
 from nwpc_workflow_model.ecflow import Bunch, ErrorStatusTaskVisitor, pre_order_travel, NodeStatus
 
 from nmp_broker.common.workflow.status_strategy import is_new_abort_task_found, is_new_abort_root_found
@@ -73,7 +75,7 @@ def handle_status_message(owner: str, repo: str, message_data: dict) -> None:
     server_status = bunch.status
 
     if server_status == NodeStatus.aborted:
-        cached_sms_server_status = data_store.mongodb.workflow.get_server_status_from_cache(owner, repo, server_name)
+        cached_sms_server_status = mongodb_workflow.get_server_status_from_cache(owner, repo, server_name)
         if cached_sms_server_status is not None:
 
             print('building bunch from cache message...')
@@ -84,7 +86,7 @@ def handle_status_message(owner: str, repo: str, message_data: dict) -> None:
 
             if True:
             # if is_new_abort_task_found(owner, repo, previous_server_status, error_task_dict_list):
-                nmp_model_system_dict = data_store.save_server_status_to_nmp_model_system(
+                nmp_model_system_dict = mongodb_workflow.save_server_status_to_nmp_model_system(
                     owner, repo, server_name,
                     message_data, error_task_dict_list
                 )
@@ -123,9 +125,9 @@ def handle_status_message(owner: str, repo: str, message_data: dict) -> None:
         'timestamp': datetime.datetime.utcnow(),
         'error_task_list': error_task_dict_list
     }
-    data_store.redis.save_error_task_list_to_cache(owner, repo, error_task_value)
+    redis_workflow.save_error_task_list_to_cache(owner, repo, error_task_value)
 
-    data_store.mongodb.workflow.save_server_status_to_cache(owner, repo, server_name, message_data)
+    mongodb_workflow.save_server_status_to_cache(owner, repo, server_name, message_data)
 
     # 发送给外网服务器
     website_url = current_app.config['BROKER_CONFIG']['cloud']['put']['url'].format(

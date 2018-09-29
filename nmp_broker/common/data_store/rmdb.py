@@ -45,7 +45,7 @@ def get_new_64bit_ticket():
         connection.execute("REPLACE INTO tickets_64 (stub) VALUES ('a');")
         (batch_id,) = connection.execute('SELECT LAST_INSERT_ID() AS id').fetchone()
         trans.commit()
-    except:
+    except Exception:
         trans.rollback()
         raise
     return batch_id

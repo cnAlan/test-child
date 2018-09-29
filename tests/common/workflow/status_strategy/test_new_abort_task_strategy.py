@@ -20,7 +20,7 @@ def mock_has_error_task(owner, repo):
 
 def test_case_previous_is_not_aborted(app, monkeypatch):
     with app.app_context():
-        from nmp_broker.common import data_store
+        from nmp_broker.common.data_store.redis import workflow
         from nmp_broker.common.workflow.status_strategy import is_new_abort_task_found
         owner = 'nwp_xp'
         repo = 'nwpc_op'
@@ -36,14 +36,14 @@ def test_case_previous_is_not_aborted(app, monkeypatch):
             }
         ]
 
-        monkeypatch.setattr(data_store, 'get_error_task_list_from_cache', mock_has_error_task)
+        monkeypatch.setattr(workflow, 'get_error_task_list_from_cache', mock_has_error_task)
 
         assert is_new_abort_task_found(owner, repo, previous_server_status, error_task_dict_list)
 
 
 def test_case_new_found(app, monkeypatch):
     with app.app_context():
-        from nmp_broker.common import data_store
+        from nmp_broker.common.data_store.redis import workflow
         from nmp_broker.common.workflow.status_strategy import is_new_abort_task_found
         owner = 'nwp_xp'
         repo = 'nwpc_op'
@@ -67,14 +67,14 @@ def test_case_new_found(app, monkeypatch):
             }
         ]
 
-        monkeypatch.setattr(data_store, 'get_error_task_list_from_cache', mock_has_error_task)
+        monkeypatch.setattr(workflow, 'get_error_task_list_from_cache', mock_has_error_task)
 
         assert is_new_abort_task_found(owner, repo, previous_server_status, error_task_dict_list)
 
 
 def test_case_not_new_found(app, monkeypatch):
     with app.app_context():
-        from nmp_broker.common import data_store
+        from nmp_broker.common.data_store.redis import workflow
         from nmp_broker.common.workflow.status_strategy import is_new_abort_task_found
         owner = 'nwp_xp'
         repo = 'nwpc_op'
@@ -90,6 +90,6 @@ def test_case_not_new_found(app, monkeypatch):
             }
         ]
 
-        monkeypatch.setattr(data_store, 'get_error_task_list_from_cache', mock_has_error_task)
+        monkeypatch.setattr(workflow, 'get_error_task_list_from_cache', mock_has_error_task)
 
         assert not is_new_abort_task_found(owner, repo, previous_server_status, error_task_dict_list)

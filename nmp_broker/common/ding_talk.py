@@ -2,7 +2,9 @@
 import requests
 from flask import json
 
-from nmp_broker.common import data_store
+from nmp_broker.common.data_store.redis.alert import (
+    save_dingtalk_access_token_to_cache, get_dingtalk_access_token_from_cache)
+from nmp_broker.common.data_store.rmdb import get_ding_talk_warn_user_list
 
 REQUEST_POST_TIME_OUT = 20
 
@@ -43,7 +45,7 @@ class Auth(object):
         print(response_json)
         if response_json['errcode'] == 0:
             access_token = response_json['access_token']
-            data_store.save_dingtalk_access_token_to_cache(access_token)
+            save_dingtalk_access_token_to_cache(access_token)
             result = {
                 'status': 'ok',
                 'access_token': access_token
@@ -56,16 +58,16 @@ class Auth(object):
         return result
 
     def get_access_token_from_cache(self) -> str:
-        return data_store.get_dingtalk_access_token_from_cache()
+        return get_dingtalk_access_token_from_cache()
 
     def save_access_token_to_cache(self, access_token: str) -> None:
-        return data_store.save_dingtalk_access_token_to_cache(access_token)
+        return save_dingtalk_access_token_to_cache(access_token)
 
     def get_access_token(self) -> str:
-        dingtalk_access_token = data_store.get_dingtalk_access_token_from_cache()
+        dingtalk_access_token = get_dingtalk_access_token_from_cache()
         if dingtalk_access_token is None:
             self.get_access_token_from_server()
-            dingtalk_access_token = data_store.get_dingtalk_access_token_from_cache()
+            dingtalk_access_token = get_dingtalk_access_token_from_cache()
         return dingtalk_access_token
 
 
@@ -94,7 +96,7 @@ class DingTalkApp(object):
             }
         :return:
         """
-        warn_user_list = data_store.get_ding_talk_warn_user_list(warning_data['owner'], warning_data['repo'])
+        warn_user_list = get_ding_talk_warn_user_list(warning_data['owner'], warning_data['repo'])
 
         print('Get new error task. Pushing warning message...')
 
