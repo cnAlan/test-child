@@ -4,7 +4,7 @@ from nmp_broker.common.data_store.rmdb import get_new_64bit_ticket
 
 from nmp_model.mongodb.tree import TreeData, Tree, TreeNode
 from nmp_model.mongodb.commit import CommitData, Commit
-from nmp_model.mongodb.workflow_cache import WorkflowCacheData, WorkflowCache
+from nmp_model.mongodb.cache.workflow_cache import WorkflowCacheData, WorkflowCache
 
 
 def save_server_status_to_nmp_model_system(
