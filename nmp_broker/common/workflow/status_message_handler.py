@@ -6,13 +6,11 @@ import gzip
 import requests
 from flask import json, current_app
 
-from nmp_model.mongodb.blobs.aborted_tasks import AbortedTasksBlob
+from nmp_model.mongodb.blobs.workflow.aborted_tasks import AbortedTasksBlob
 from nmp_broker.common import weixin
 from nmp_broker.common.data_store.redis import workflow as redis_workflow
 from nmp_broker.common.data_store.mongodb import workflow as mongodb_workflow
 from nwpc_workflow_model.ecflow import Bunch, ErrorStatusTaskVisitor, pre_order_travel, NodeStatus
-
-from nmp_broker.common.workflow.status_strategy import is_new_abort_task_found, is_new_abort_root_found
 
 REQUEST_POST_TIME_OUT = 20
 

@@ -1,8 +1,8 @@
 # coding: utf-8
 from datetime import datetime
 
-from nmp_model.mongodb.blobs.status import StatusBlob
-from nmp_model.mongodb.blobs.aborted_tasks import AbortedTasksBlob
+from nmp_model.mongodb.blobs.workflow.status import StatusBlob
+from nmp_model.mongodb.blobs.workflow.aborted_tasks import AbortedTasksBlob
 from nmp_model.mongodb.tree import Tree
 from nmp_model.mongodb.commit import Commit
 

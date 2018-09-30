@@ -5,9 +5,9 @@ import gzip
 import requests
 from flask import current_app, json
 
-from nmp_broker.common import weixin, data_store
+from nmp_broker.common import data_store
 
-from nmp_model.mongodb.blobs.unfit_nodes import UnfitNodesBlob
+from nmp_model.mongodb.blobs.workflow.unfit_nodes import UnfitNodesBlob
 
 
 REQUEST_POST_TIME_OUT = 20

@@ -22,7 +22,7 @@ def save_server_status_to_nmp_model_system(
     :param error_task_dict_list:
     :return:
     """
-    from nmp_model.mongodb.blobs.status import StatusContent, StatusBlobData, StatusBlob
+    from nmp_model.mongodb.blobs.workflow.status import StatusContent, StatusBlobData, StatusBlob
     status_blob = StatusBlob(
         ticket_id=get_new_64bit_ticket(),
         owner=owner,
@@ -39,7 +39,7 @@ def save_server_status_to_nmp_model_system(
     )
     status_blob.save()
 
-    from nmp_model.mongodb.blobs.aborted_tasks import AbortedTasksContent, AbortedTasksBlobData, AbortedTasksBlob
+    from nmp_model.mongodb.blobs.workflow.aborted_tasks import AbortedTasksContent, AbortedTasksBlobData, AbortedTasksBlob
     aborted_tasks_blob = AbortedTasksBlob(
         ticket_id=get_new_64bit_ticket(),
         owner=owner,
@@ -140,7 +140,7 @@ def save_task_check_to_nmp_model_system(
         message_data: dict,
         unfit_node_list: list
 ) -> dict:
-    from nmp_model.mongodb.blobs.unfit_nodes import UnfitNodesContent, UnfitNodesBlobData, UnfitNodesBlob, \
+    from nmp_model.mongodb.blobs.workflow.unfit_nodes import UnfitNodesContent, UnfitNodesBlobData, UnfitNodesBlob, \
         UnfitNode, StatusCheckResult, VariableCheckResult
 
     unfit_nodes = []
