@@ -8,3 +8,4 @@ import nmp_broker.api_v2.api_repo
 import nmp_broker.api_v2.api_hpc
 import nmp_broker.api_v2.api_nofitication
 import nmp_broker.api_v2.api_workflow
+import nmp_broker.api_v2.api_workload
