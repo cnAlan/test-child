@@ -3,7 +3,7 @@ import datetime
 from nmp_broker.common.data_store.rmdb import get_new_64bit_ticket
 
 from nmp_model.mongodb.tree import TreeData, Tree, TreeNode
-from nmp_model.mongodb.commit import CommitData, Commit
+from nmp_model.mongodb.commits.workflow_commit import WorkflowCommitData, WorkflowCommit
 from nmp_model.mongodb.cache.workflow_cache import WorkflowCacheData, WorkflowCache
 
 
@@ -77,11 +77,11 @@ def save_server_status_to_nmp_model_system(
     )
     tree_object.save()
 
-    commit_object = Commit(
+    commit_object = WorkflowCommit(
         ticket_id=get_new_64bit_ticket(),
         owner=owner,
         repo=repo,
-        data=CommitData(
+        data=WorkflowCommitData(
             committer='aix',
             type='status',
             tree_ticket_id=tree_object.ticket_id,
@@ -204,11 +204,11 @@ def save_task_check_to_nmp_model_system(
     )
     tree_object.save()
 
-    commit_object = Commit(
+    commit_object = WorkflowCommit(
         ticket_id=get_new_64bit_ticket(),
         owner=owner,
         repo=repo,
-        data=CommitData(
+        data=WorkflowCommitData(
             committer='broker',
             type='task_check',
             tree_ticket_id=tree_object.ticket_id,

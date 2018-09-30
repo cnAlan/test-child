@@ -4,7 +4,7 @@ from datetime import datetime
 from nmp_model.mongodb.blobs.workflow.status import StatusBlob
 from nmp_model.mongodb.blobs.workflow.aborted_tasks import AbortedTasksBlob
 from nmp_model.mongodb.tree import Tree
-from nmp_model.mongodb.commit import Commit
+from nmp_model.mongodb.commits.workflow_commit import WorkflowCommit
 
 
 def test_save_server_status(app):
@@ -73,7 +73,7 @@ def test_save_server_status(app):
 
         # check commits
         commit = commits[0]
-        assert isinstance(commit, Commit)
+        assert isinstance(commit, WorkflowCommit)
         assert commit.data.tree_ticket_id == tree.ticket_id
 
 
