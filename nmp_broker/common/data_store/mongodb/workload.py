@@ -1,68 +1,75 @@
 # coding: utf-8
 import datetime
+from nmp_broker.common.data_store.rmdb import get_new_64bit_ticket
 
 
-def save_loadleveler_status_to_nwpc_takler_object_system(
+def save_abnormal_jobs_to_nmp_model_system(
         owner: str, repo: str,
         plugin_result: dict
 ) -> dict:
-    abnormal_jobs_blob = Blob()
-    abnormal_jobs_blob.id = get_new_64bit_ticket()
-    abnormal_jobs_blob.owner = owner
-    abnormal_jobs_blob.repo = repo
-    status_blob_data = {
-        'type': 'hpc_loadleveler_status',
-        'name': 'abnormal_jobs',
-        'content': {
-            'plugin_name': plugin_result['name'],
-            'abnormal_job_list': plugin_result['data']['target_job_items'],
-            'update_time': datetime.datetime.utcnow(),
-        }
-    }
-    abnormal_jobs_blob.set_data(status_blob_data)
-    blobs_collection = nwpc_monitor_platform_mongodb.blobs
-    blobs_collection.insert_one(abnormal_jobs_blob.to_dict())
+    from nmp_model.mongodb.blobs.workload.abnormal_jobs import (
+        AbnormalJobsContent, AbnormalJobsBlobData, AbnormalJobsBlob)
+    from nmp_model.mongodb.trees.workload_tree_node import WorkloadTreeNode
+    from nmp_model.mongodb.tree import TreeData, Tree
+    from nmp_model.mongodb.commits.workload_commit import WorkloadCommit, WorkloadCommitData
 
-    tree_object = Tree()
-    tree_object.id = get_new_64bit_ticket()
-    tree_object.owner = owner
-    tree_object.repo = repo
-    tree_object_data = {
-        'nodes': [
-            {
-                'type': 'hpc_loadleveler_status',
-                'name': 'abnormal_jobs',
-                'blob_ticket_id': abnormal_jobs_blob.id
-            }
-        ]
-    }
-    tree_object.set_data(tree_object_data)
-    trees_collection = nwpc_monitor_platform_mongodb.trees
-    trees_collection.insert_one(tree_object.to_dict())
+    abnormal_jobs_blob = AbnormalJobsBlob(
+        owner=owner,
+        repo=repo,
+        ticket_id=get_new_64bit_ticket(),
+        data=AbnormalJobsBlobData(
+            workload_system=plugin_result['data']['workload_system'],
+            user_name=plugin_result['data']['user_name'],
+            collected_time=plugin_result['data']['collected_time'],
+            content=AbnormalJobsContent(
+                plugins=plugin_result['data']['plugins'],
+                abnormal_jobs=plugin_result['data']['target_job_items']
+            )
+        )
+    )
 
-    commit_object = Commit()
-    commit_object.id = get_new_64bit_ticket()
-    commit_object.owner = owner
-    commit_object.repo = repo
-    commit_object_data = {
-        'committer': 'broker',
-        'type': 'hpc_loadleveler_status',
-        'tree_ticket_id': tree_object.id,
-        'committed_time': datetime.datetime.utcnow()
-    }
-    commit_object.set_data(commit_object_data)
-    commits_collection = nwpc_monitor_platform_mongodb.commits
-    commits_collection.insert_one(commit_object.to_dict())
+    abnormal_jobs_blob.save()
+
+    tree_object = Tree(
+        ticket_id=get_new_64bit_ticket(),
+        owner=owner,
+        repo=repo,
+        data=TreeData(
+            nodes=[
+                WorkloadTreeNode(
+                    type='abnormal_jobs',
+                    name='loadleveler.abnormal_jobs',
+                    blob_ticket_id=abnormal_jobs_blob.ticket_id
+                )
+            ]
+        )
+    )
+
+    tree_object.save()
+
+    commit_object = WorkloadCommit(
+        ticket_id=get_new_64bit_ticket(),
+        owner=owner,
+        repo=repo,
+        data=WorkloadCommitData(
+            committer='nmp-broker',
+            type='abnormal_jobs',
+            tree_ticket_id=tree_object.ticket_id,
+            committed_time=datetime.datetime.utcnow()
+        )
+    )
+
+    commit_object.save()
 
     return {
         'blobs': [
-            abnormal_jobs_blob.to_dict()
+            abnormal_jobs_blob
         ],
         'trees': [
-            tree_object.to_dict()
+            tree_object
         ],
         'commits': [
-            commit_object.to_dict()
+            commit_object
         ]
     }
 

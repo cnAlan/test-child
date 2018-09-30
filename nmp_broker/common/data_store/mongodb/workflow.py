@@ -40,7 +40,8 @@ def save_server_status_to_nmp_model_system(
     )
     status_blob.save()
 
-    from nmp_model.mongodb.blobs.workflow.aborted_tasks import AbortedTasksContent, AbortedTasksBlobData, AbortedTasksBlob
+    from nmp_model.mongodb.blobs.workflow.aborted_tasks import (
+        AbortedTasksContent, AbortedTasksBlobData, AbortedTasksBlob)
     aborted_tasks_blob = AbortedTasksBlob(
         ticket_id=get_new_64bit_ticket(),
         owner=owner,
