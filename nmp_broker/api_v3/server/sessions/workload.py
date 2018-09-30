@@ -71,7 +71,7 @@ def receive_loadleveler_status(host, user):
             else:
                 print("Found new long time operation jobs. Send warn message.")
 
-                takler_object_system_dict = data_store.save_loadleveler_status_to_nwpc_takler_object_system(
+                takler_object_system_dict = data_store.save_abnormal_jobs_to_nmp_model_system(
                     user, 'hpc', plugin_result)
 
                 abnormal_jobs_blob_id = None

@@ -2,7 +2,8 @@
 import datetime
 from nmp_broker.common.data_store.rmdb import get_new_64bit_ticket
 
-from nmp_model.mongodb.tree import TreeData, Tree, TreeNode
+from nmp_model.mongodb.tree import TreeData, Tree
+from nmp_model.mongodb.trees.workflow_tree_node import WorkflowTreeNode
 from nmp_model.mongodb.commits.workflow_commit import WorkflowCommitData, WorkflowCommit
 from nmp_model.mongodb.cache.workflow_cache import WorkflowCacheData, WorkflowCache
 
@@ -62,12 +63,12 @@ def save_server_status_to_nmp_model_system(
         repo=repo,
         data=TreeData(
             nodes=[
-                TreeNode(
+                WorkflowTreeNode(
                     type='status',
                     name='server_status',
                     blob_ticket_id=status_blob.ticket_id
                 ),
-                TreeNode(
+                WorkflowTreeNode(
                     type='aborted_tasks',
                     name='server_aborted_tasks',
                     blob_ticket_id=aborted_tasks_blob.ticket_id
@@ -194,7 +195,7 @@ def save_task_check_to_nmp_model_system(
         repo=repo,
         data=TreeData(
             nodes=[
-                TreeNode(
+                WorkflowTreeNode(
                     type="unfit_tasks",
                     name="check_task_unfit_nodes",
                     blob_ticket_id=unfit_nodes_blob.ticket_id
