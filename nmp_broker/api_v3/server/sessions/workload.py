@@ -60,7 +60,7 @@ def receive_loadleveler_status(host, user):
 
     message_data = message['data']
 
-    key, value = data_store.save_hpc_loadleveler_status_to_cache(user, message)
+    key, value = data_store.save_workload_status_to_cache(user, message)
 
     if 'error' not in message:
         plugin_result = long_time_operation_job_warn.warn_long_time_operation_job(user, message)

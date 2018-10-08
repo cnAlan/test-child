@@ -1,6 +1,8 @@
 # coding: utf-8
 import datetime
 from nmp_broker.common.data_store.rmdb import get_new_64bit_ticket
+from nmp_model.mongodb.cache.workload_cache import (
+    WorkloadCacheData, WorkloadCache, JobListContent, QueueInfoListContent)
 
 
 def save_abnormal_jobs_to_nmp_model_system(
@@ -76,28 +78,65 @@ def save_abnormal_jobs_to_nmp_model_system(
 
 # loadleveler status
 
-def save_hpc_loadleveler_status_to_cache(user: str, message: dict) -> tuple:
-    key = {
-        'data.user': user
-    }
-    value = {
-        'app': 'nmp_broker',
-        'event': 'post_sms_task_check',
-        'data': {
-            'user': user,
-            'type': 'job_list',
-            'update_time': datetime.datetime.utcnow(),
-            'message': message
-        }
+def save_workload_status_to_cache(owner: str, repo: str, user_name: str, message: dict) -> WorkloadCache:
+    result_set = WorkloadCache.objects(owner=owner, repo=repo, data__user_name=user_name)
 
-    }
-    hpc_loadleveler_status.update(key, value, upsert=True)
-    return key, value
+    data_type = message['data']['type']
+
+    if data_type == JobListContent.__name__:
+        data_content = JobListContent(
+            items=message['data']['response']['items']
+        )
+    elif data_type == QueueInfoListContent.__name__:
+        data_content = QueueInfoListContent(
+            items=message['data']['response']['items']
+        )
+    else:
+        raise ValueError('data type is not supported: ', data_type)
+
+    data = WorkloadCacheData(
+        user_name=user_name,
+        collected_time=message['data']['collected_time'],
+        update_time=datetime.datetime.utcnow(),
+        request=message['data']['request'],
+        content=data_content
+    )
+
+    if len(result_set) == 0:
+        status_cache = WorkloadCache(
+            ticket_id=get_new_64bit_ticket(),
+            owner=owner,
+            repo=repo,
+            data=data
+        )
+        status_cache.save()
+    else:
+        status_cache = result_set.first()
+        status_cache.modify(data=data)
+
+    return status_cache
+
+    # key = {
+    #     'data.user': user
+    # }
+    # value = {
+    #     'app': 'nmp_broker',
+    #     'event': 'post_sms_task_check',
+    #     'data': {
+    #         'user': user,
+    #         'type': 'job_list',
+    #         'update_time': datetime.datetime.utcnow(),
+    #         'message': message
+    #     }
+    #
+    # }
+    # hpc_loadleveler_status.update(key, value, upsert=True)
+    # return key, value
 
 
-def get_hpc_loadleveler_status_from_cache(user: str) -> dict:
-    key = {
-        'owner': user
-    }
-    value = hpc_loadleveler_status.find_one(key, {"_id": 0})
-    return value
+def get_workload_status_from_cache(owner: str, repo: str, user_name: str) -> dict or None:
+    result_set = WorkloadCache.objects(owner=owner, repo=repo, data__user_name=user_name)
+    if len(result_set) == 0:
+        return None
+    else:
+        return result_set.first().to_dict()
