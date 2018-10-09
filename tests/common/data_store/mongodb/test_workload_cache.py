@@ -1,10 +1,9 @@
 # coding: utf-8
 from datetime import datetime
-# from mongoengine import connect
 import pytest
 
 
-def test_save_to_cache(app):
+def test_loadleveler_to_cache(app):
     with app.app_context():
         from nmp_broker.common.data_store.mongodb.workload import \
             save_workload_status_to_cache, get_workload_status_from_cache
@@ -75,26 +74,22 @@ def test_save_to_cache(app):
             }
         }
 
-        # from nmp_broker.common.database import mongodb_client
-        # mongodb_client.close()
-        # connect('mongoenginetest', host='mongomock://localhost')
-
-        status_cache = save_workload_status_to_cache(
+        saved_status_cache = save_workload_status_to_cache(
             owner,
             repo,
             user_name,
             message
         )
 
-        status_cache_dict = get_workload_status_from_cache(
+        status_cache = get_workload_status_from_cache(
             owner,
             repo,
             user_name
         )
 
-        assert status_cache_dict['owner'] == owner
-        assert status_cache_dict['repo'] == repo
-        status_data = status_cache_dict['data']
-        assert status_data['user_name'] == user_name
-        assert status_data['collected_time'].replace(microsecond=0) == current_time
-        assert status_data['content']['items'] == message['data']['response']['items']
+        assert status_cache.owner == owner
+        assert status_cache.repo == repo
+        status_data = status_cache.data
+        assert status_data.user_name == user_name
+        assert status_data.collected_time.replace(microsecond=0) == current_time
+        assert status_data.content.items == message['data']['response']['items']

@@ -134,9 +134,9 @@ def save_workload_status_to_cache(owner: str, repo: str, user_name: str, message
     # return key, value
 
 
-def get_workload_status_from_cache(owner: str, repo: str, user_name: str) -> dict or None:
+def get_workload_status_from_cache(owner: str, repo: str, user_name: str) -> WorkloadCache or None:
     result_set = WorkloadCache.objects(owner=owner, repo=repo, data__user_name=user_name)
     if len(result_set) == 0:
         return None
     else:
-        return result_set.first().to_dict()
+        return result_set.first()

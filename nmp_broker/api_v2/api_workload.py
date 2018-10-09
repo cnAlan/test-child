@@ -25,8 +25,14 @@ def receive_loadleveler_status(user):
                 type: 'command',
                 time: "%Y-%m-%d %H:%M:%S",
                 data: {
+                    workload_system: loadleveler,
+                    user_name: user name,
+                    collected_time: "%Y-%m-%d %H:%M:%S",
+                    type: 'JobListContent',
                     request: {
-                        sub_command: args.sub_command,
+                        command: 'loadleveler_status',
+                        sub_command: 'collect',
+                        arguments: []
                     },
                     response: model_dict
                         {
