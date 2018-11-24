@@ -10,7 +10,9 @@ from nmp_model.mongodb.blobs.workflow.aborted_tasks import AbortedTasksBlob
 from nmp_broker.common import weixin
 from nmp_broker.common.data_store.redis import workflow as redis_workflow
 from nmp_broker.common.data_store.mongodb import workflow as mongodb_workflow
+from nmp_broker.common.workflow.status_strategy import is_new_abort_task_found, is_new_abort_root_found
 from nwpc_workflow_model.ecflow import Bunch, ErrorStatusTaskVisitor, pre_order_travel, NodeStatus
+
 
 REQUEST_POST_TIME_OUT = 20
 
@@ -82,8 +84,20 @@ def handle_status_message(owner: str, repo: str, message_data: dict) -> None:
 
             previous_server_status = cached_bunch.status
 
-            if True:
-            # if is_new_abort_task_found(owner, repo, previous_server_status, error_task_dict_list):
+            send_warning_flag = False
+
+            warn_strategy = current_app.config['BROKER_CONFIG']['weixin_app']['warn']['strategy']
+
+            if warn_strategy == "always":
+                send_warning_flag = True
+            elif warn_strategy == "new_abort_task":
+                send_warning_flag = is_new_abort_task_found(owner, repo, previous_server_status, error_task_dict_list)
+            elif warn_strategy == "new_abort_root":
+                send_warning_flag = is_new_abort_root_found(owner, repo, previous_server_status, server_status)
+            else:
+                current_app.logger.warn('warn strategy is not supported:', warn_strategy)
+
+            if send_warning_flag:
                 nmp_model_system_dict = mongodb_workflow.save_server_status_to_nmp_model_system(
                     owner, repo, server_name,
                     message_data, error_task_dict_list

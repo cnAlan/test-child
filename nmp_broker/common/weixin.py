@@ -161,8 +161,9 @@ class WeixinApp(object):
                 "url": message_url
             }
         ]
-        # to_user = "@all"
-        to_user = "wangdp"
+
+        to_user = self.weixin_config['warn']['to_user']
+
         warning_post_message = {
             "touser": to_user,
             "agentid": 2,
