@@ -2,7 +2,7 @@
 import datetime
 import gzip
 
-from flask import request, jsonify, json
+from flask import request, jsonify, json, current_app
 
 from nmp_broker.api_v3 import api_v3_app
 from nmp_broker.common.workflow.status_message_handler import handle_status_message
@@ -52,7 +52,7 @@ def receive_workflow_status_message(owner, repo):
         message_data = message['data']
         handle_status_message(owner, repo, message_data)
     else:
-        print("message app is unknown", message_app)
+        current_app.logger.error("message app is unknown", message_app)
         result = {
             'status': 'error',
             'message': 'message app is unknown ' + message_app
@@ -63,6 +63,8 @@ def receive_workflow_status_message(owner, repo):
         'status': 'ok'
     }
     end_time = datetime.datetime.utcnow()
-    print(end_time - start_time)
+    current_app.logger.info("{owner}/{repo}/status used {time_cost}".format(
+        owner=owner, repo=repo,
+        time_cost=end_time - start_time))
 
     return jsonify(result)

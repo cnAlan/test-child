@@ -1,5 +1,6 @@
 # coding=utf-8
 from pathlib import Path
+import logging
 
 from flask import Flask
 
@@ -18,6 +19,7 @@ def create_app(config_file_path=None):
     app.config.from_object(load_config(config_file_path))
     app.json_encoder = NMPBrokerApiJSONEncoder
     app.url_map.converters['no_static'] = NoStaticConverter
+    app.logger.setLevel(logging.DEBUG)
 
     with app.app_context():
         import nmp_broker.common.database
