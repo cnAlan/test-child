@@ -80,7 +80,17 @@ broker:
       cloud:
         put:
           url: https://www.example.com/api/v1/hpc/info/disk/space
+
+    # deprecated config
     loadleveler_status:
       cloud:
         put:
           url: https://www.example.com/api/v1/hpc/users/{user}/loadleveler/status
+
+  workload:
+    jobs:
+      cloud:
+        put:
+          url: https://www.example.com/api/v1/hpc/user/{user}/loadleveler/status
+      warn:
+        strategy: always

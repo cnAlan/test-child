@@ -1,16 +1,17 @@
 # coding: utf-8
 from datetime import datetime
+
 import pytest
 
 
-def test_loadleveler_to_cache(app):
+def test_handle_loadleveler_method(app):
+    from nmp_broker.common.workload.jobs_message_handler import handle_jobs_message
     with app.app_context():
-        from nmp_broker.common.data_store.mongodb.workload import \
-            save_workload_status_to_cache, get_workload_status_from_cache
-        owner = 'nwpc_xp'
-        repo = 'pi_nwp'
+        owner = 'nwp_xp'
+        repo = 'aix_uranus'
         user_name = 'nwp'
         current_time = datetime.utcnow().replace(microsecond=0)
+
         message = {
             'data': {
                 'workload_system': 'loadleveler',
@@ -75,20 +76,4 @@ def test_loadleveler_to_cache(app):
             }
         }
 
-        saved_status_cache = save_workload_status_to_cache(
-            owner,
-            repo,
-            message
-        )
-
-        status_cache = get_workload_status_from_cache(
-            owner,
-            repo
-        )
-
-        assert status_cache.owner == owner
-        assert status_cache.repo == repo
-        status_data = status_cache.data
-        assert status_data.user_name == user_name
-        assert status_data.collected_time.replace(microsecond=0) == current_time
-        assert status_data.content.items == message['data']['response']['items']
+        handle_jobs_message(owner, repo, message)

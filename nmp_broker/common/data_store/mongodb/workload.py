@@ -78,7 +78,8 @@ def save_abnormal_jobs_to_nmp_model_system(
 
 # loadleveler status
 
-def save_workload_status_to_cache(owner: str, repo: str, user_name: str, message: dict) -> WorkloadCache:
+def save_workload_status_to_cache(owner: str, repo: str, message: dict) -> WorkloadCache:
+    user_name = message['data']['user_name']
     result_set = WorkloadCache.objects(owner=owner, repo=repo, data__user_name=user_name)
 
     data_type = message['data']['type']
@@ -134,8 +135,8 @@ def save_workload_status_to_cache(owner: str, repo: str, user_name: str, message
     # return key, value
 
 
-def get_workload_status_from_cache(owner: str, repo: str, user_name: str) -> WorkloadCache or None:
-    result_set = WorkloadCache.objects(owner=owner, repo=repo, data__user_name=user_name)
+def get_workload_status_from_cache(owner: str, repo: str, user_name: str = '') -> WorkloadCache or None:
+    result_set = WorkloadCache.objects(owner=owner, repo=repo)
     if len(result_set) == 0:
         return None
     else:

@@ -66,7 +66,7 @@ def receive_loadleveler_status(user):
 
     message_data = message['data']
 
-    key, value = data_store.save_workload_status_to_cache(user, message)
+    key, value = data_store.save_workload_status_to_cache('nwp_xp', 'hpc', user, message)
 
     if 'error' not in message:
         plugin_result = long_time_operation_job_warn.warn_long_time_operation_job(user, message)
