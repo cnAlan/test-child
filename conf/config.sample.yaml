@@ -46,7 +46,7 @@ broker:
     warn:
       url: https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={weixin_access_token}
       agentid: agentid
-      strategy: always
+      strategy: always  # always, new_abort_task, new_abort_root
       to_user: wangdp
 
   # cloud url for sms status.
@@ -93,4 +93,4 @@ broker:
         put:
           url: https://www.example.com/api/v1/hpc/user/{user}/loadleveler/status
       warn:
-        strategy: always
+        strategy: always  # always, new_job
