@@ -2,6 +2,8 @@
 
 
 def is_server_status_aborted(server_status):
+    if server_status is None:
+        return False
     return server_status == 'abo' or \
         server_status == 'aborted' or \
         server_status.name.lower() == 'aborted'
