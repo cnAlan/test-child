@@ -21,7 +21,7 @@ def save_abnormal_jobs_to_nmp_model_system(
         ticket_id=get_new_64bit_ticket(),
         data=AbnormalJobsBlobData(
             workload_system=plugin_result['data']['workload_system'],
-            user_name=plugin_result['data']['user_name'],
+            user_name=owner,
             collected_time=plugin_result['data']['collected_time'],
             content=AbnormalJobsContent(
                 plugins=plugin_result['data']['plugins'],
@@ -79,8 +79,7 @@ def save_abnormal_jobs_to_nmp_model_system(
 # loadleveler status
 
 def save_workload_status_to_cache(owner: str, repo: str, message: dict) -> WorkloadCache:
-    user_name = message['data']['user_name']
-    result_set = WorkloadCache.objects(owner=owner, repo=repo, data__user_name=user_name)
+    result_set = WorkloadCache.objects(owner=owner, repo=repo)
 
     data_type = message['data']['type']
 
@@ -96,7 +95,7 @@ def save_workload_status_to_cache(owner: str, repo: str, message: dict) -> Workl
         raise ValueError('data type is not supported: ', data_type)
 
     data = WorkloadCacheData(
-        user_name=user_name,
+        user_name=owner,
         collected_time=message['data']['collected_time'],
         update_time=datetime.datetime.utcnow(),
         request=message['data']['request'],

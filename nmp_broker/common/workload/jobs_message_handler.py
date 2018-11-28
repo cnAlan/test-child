@@ -6,6 +6,7 @@ import requests
 from flask import current_app, json
 
 from nmp_model.mongodb.blobs.workload.abnormal_jobs import AbnormalJobsBlob
+from nmp_model.mongodb.cache.workload_cache import JobListContent
 from nmp_broker.common import data_store, weixin
 from nmp_broker.plugins.loadleveler import long_time_operation_job_warn
 
@@ -14,18 +15,18 @@ REQUEST_POST_TIME_OUT = 20
 
 
 def handle_jobs_message(owner, repo, message):
-    status_cache = data_store.save_workload_status_to_cache('nwp_xp', 'hpc', message)
+    message['data']['type'] = JobListContent.__name__
+    status_cache = data_store.save_workload_status_to_cache(owner, repo, message)
 
-    user = message['data']['user_name']
     workload_system = message['data']['workload_system']
 
     if workload_system == "loadleveler":
-        handle_loadleveler_jobs(owner, repo, user, message)
+        handle_loadleveler_jobs(owner, repo, message)
     else:
         current_app.logger.warn("workload system is not supported: {workload_system}".format(
             workload_system=workload_system))
 
-    current_app.logger.info("post workload jobs to cloud...{user}".format(user=user))
+    current_app.logger.info("post workload jobs to cloud...{owner}/{repo}".format(owner=owner, repo=repo))
 
     post_message = {
         'app': 'nmp_broker',
@@ -42,8 +43,7 @@ def handle_jobs_message(owner, repo, message):
     }
     post_url = current_app.config['BROKER_CONFIG']['workload']['jobs']['cloud']['put']['url'].format(
         owner=owner,
-        rpeo=repo,
-        user=user
+        rpeo=repo
     )
 
     current_app.logger.info('gzip the data...')
@@ -60,7 +60,7 @@ def handle_jobs_message(owner, repo, message):
     current_app.logger.info("post workload jobs to cloud...done {response}".format(response=response))
 
 
-def handle_loadleveler_jobs(owner, repo, user, message):
+def handle_loadleveler_jobs(owner, repo, message):
     warn_strategy = current_app.config['BROKER_CONFIG']['workload']['jobs']['warn']['strategy']
     plugin_result = long_time_operation_job_warn.warn_long_time_operation_job(owner, repo, message, warn_strategy)
     if plugin_result:
@@ -101,8 +101,7 @@ def handle_loadleveler_jobs(owner, repo, user, message):
 
             website_url = current_app.config['BROKER_CONFIG']['workload']['jobs']['cloud']['put']['url'].format(
                 owner=owner,
-                repo=repo,
-                user=user
+                repo=repo
             )
             response = requests.post(
                 website_url,
@@ -119,4 +118,4 @@ def handle_loadleveler_jobs(owner, repo, user, message):
                 cloud_config=current_app.config['BROKER_CONFIG']['cloud']
             )
             weixin_app.send_loadleveler_status_warning_message(
-                user, plugin_result, abnormal_jobs_blob_id)
+                owner, plugin_result, abnormal_jobs_blob_id)

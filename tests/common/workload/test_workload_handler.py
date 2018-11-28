@@ -9,7 +9,6 @@ def test_handle_loadleveler_method(app):
     with app.app_context():
         owner = 'nwp_xp'
         repo = 'aix_uranus'
-        user_name = 'nwp'
         current_time = datetime.utcnow().replace(microsecond=0)
 
         message = {
@@ -17,7 +16,6 @@ def test_handle_loadleveler_method(app):
                 'workload_system': 'loadleveler',
                 'collected_time': current_time.isoformat(),
                 'type': 'JobListContent',
-                'user_name': user_name,
                 'request': {
                     'command': 'loadleveler_status',
                     'sub_command': 'collect',

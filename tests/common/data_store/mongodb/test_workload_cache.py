@@ -9,14 +9,12 @@ def test_loadleveler_to_cache(app):
             save_workload_status_to_cache, get_workload_status_from_cache
         owner = 'nwpc_xp'
         repo = 'pi_nwp'
-        user_name = 'nwp'
         current_time = datetime.utcnow().replace(microsecond=0)
         message = {
             'data': {
                 'workload_system': 'loadleveler',
                 'collected_time': current_time.isoformat(),
                 'type': 'JobListContent',
-                'user_name': user_name,
                 'request': {
                     'command': 'loadleveler_status',
                     'sub_command': 'collect',
@@ -89,6 +87,5 @@ def test_loadleveler_to_cache(app):
         assert status_cache.owner == owner
         assert status_cache.repo == repo
         status_data = status_cache.data
-        assert status_data.user_name == user_name
         assert status_data.collected_time.replace(microsecond=0) == current_time
         assert status_data.content.items == message['data']['response']['items']
