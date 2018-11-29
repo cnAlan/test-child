@@ -212,6 +212,7 @@ class WeixinApp(object):
             repo=message['data']['repo'],
             id=message['data']['unfit_nodes_blob_id']
         )
+        to_user = self.weixin_config['warn']['to_user']
 
         articles = [
             {
@@ -247,7 +248,7 @@ class WeixinApp(object):
         ]
 
         warning_post_message = {
-            "touser": "@all",
+            "touser": to_user,
             "agentid": 2,
             "msgtype": "news",
             "news": {
@@ -308,8 +309,9 @@ class WeixinApp(object):
             }
         ]
 
+        to_user = self.weixin_config['warn']['to_user']
         post_message = {
-            "touser": "wangdp",
+            "touser": to_user,
             "agentid": 2,
             "msgtype": "news",
             "news": {
@@ -360,8 +362,9 @@ class WeixinApp(object):
                 "url": message_url
             }
         ]
+        to_user = self.weixin_config['warn']['to_user']
         post_message = {
-            "touser": "@all",
+            "touser": to_user,
             "agentid": 2,
             "msgtype": "news",
             "news": {

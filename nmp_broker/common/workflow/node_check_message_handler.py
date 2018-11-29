@@ -8,6 +8,7 @@ from flask import current_app, json
 from nmp_broker.common import data_store
 
 from nmp_model.mongodb.blobs.workflow.unfit_nodes import UnfitNodesBlob
+from nmp_broker.common import weixin
 
 
 REQUEST_POST_TIME_OUT = 20
@@ -96,8 +97,10 @@ def handle_node_check_message(owner, repo, message_data: dict) -> None:
                 'node_path': node_path,
                 'unfit_check_list': unfit_check_list
             })
+    current_app.logger.info("[{owner}/{repo}] unfit_node_list: {unfit_node_list}".format(
+        owner=owner, repo=repo, unfit_node_list=unfit_node_list
+    ))
 
-    print(unfit_node_list)
     if len(unfit_node_list) > 0:
         weixin_message = {
             'app': 'nmp_broker',
@@ -128,7 +131,7 @@ def handle_node_check_message(owner, repo, message_data: dict) -> None:
             'event': 'post_sms_task_check',
             'timestamp': datetime.datetime.utcnow(),
             'data': {
-                'type': 'takler_object',
+                'type': 'nmp_model',
                 'blobs': [blob.to_mongo().to_dict() for blob in nmp_model_results['blobs']],
                 'trees': [blob.to_mongo().to_dict() for blob in nmp_model_results['trees']],
                 'commits': [blob.to_mongo().to_dict() for blob in nmp_model_results['commits']],
@@ -139,14 +142,19 @@ def handle_node_check_message(owner, repo, message_data: dict) -> None:
             'message': json.dumps(post_message)
         }
 
-        print('gzip the data...')
+        current_app.logger.info("[{owner}/{repo}] Gzip data...".format(
+            owner=owner, repo=repo
+        ))
         gzipped_post_data = gzip.compress(bytes(json.dumps(website_post_data), 'utf-8'))
-        print('gzip the data...done')
+        current_app.logger.info("[{owner}/{repo}] Gzip data...Done".format(
+            owner=owner, repo=repo
+        ))
 
         website_url = current_app.config['BROKER_CONFIG']['sms']['task_check']['cloud']['put']['url'].format(
             owner=owner,
             repo=repo
         )
+
         response = requests.post(
             website_url,
             data=gzipped_post_data,
@@ -155,13 +163,15 @@ def handle_node_check_message(owner, repo, message_data: dict) -> None:
             },
             timeout=REQUEST_POST_TIME_OUT
         )
-        print(response)
 
-        # weixin_app = weixin.WeixinApp(
-        #     weixin_config=current_app.config['BROKER_CONFIG']['weixin_app'],
-        #     cloud_config=current_app.config['BROKER_CONFIG']['cloud']
-        # )
-        # weixin_app.send_sms_node_task_warn(weixin_message)
+        current_app.logger.info("[{owner}/{repo}] Sending alert...".format(
+            owner=owner, repo=repo, response=response))
+
+        weixin_app = weixin.WeixinApp(
+            weixin_config=current_app.config['BROKER_CONFIG']['weixin_app'],
+            cloud_config=current_app.config['BROKER_CONFIG']['cloud']
+        )
+        weixin_app.send_sms_node_task_warn(weixin_message)
 
     # else:
     #     # debug message.
