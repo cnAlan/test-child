@@ -96,7 +96,7 @@ def save_workload_status_to_cache(owner: str, repo: str, message: dict) -> Workl
 
     data = WorkloadCacheData(
         user_name=owner,
-        collected_time=message['data']['collected_time'],
+        collected_time=datetime.datetime.fromisoformat(message['data']['collected_time']),
         update_time=datetime.datetime.utcnow(),
         request=message['data']['request'],
         content=data_content

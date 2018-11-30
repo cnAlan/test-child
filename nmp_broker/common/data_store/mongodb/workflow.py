@@ -32,7 +32,7 @@ def save_server_status_to_nmp_model_system(
             name='server_status',
             content=StatusContent(
                 server_name=server_name,
-                collected_time=message['time'],
+                collected_time=datetime.datetime.fromisoformat(message['time']),
                 update_time=datetime.datetime.utcnow(),
                 status=message['status']
             )
@@ -51,7 +51,7 @@ def save_server_status_to_nmp_model_system(
             content=AbortedTasksContent(
                 status_blob_ticket_id=status_blob.ticket_id,
                 server_name='server_aborted_tasks',
-                collected_time=message['time'],
+                collected_time=datetime.datetime.fromisoformat(message['time']),
                 tasks=error_task_dict_list
             )
         )
@@ -247,7 +247,7 @@ def save_server_status_to_cache(owner: str, repo: str, server_name: str, message
 
     data = WorkflowCacheData(
         server_name=server_name,
-        collected_time=message['time'],
+        collected_time=datetime.datetime.fromisoformat(message['time']),
         update_time=datetime.datetime.utcnow(),
         status=message['status']
     )
