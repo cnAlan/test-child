@@ -6,9 +6,6 @@ import click
 import os
 import sys
 
-if 'NWPC_MONITOR_PLATFORM_BASE' in os.environ:
-    sys.path.append(os.environ['NWPC_MONITOR_PLATFORM_BASE'])
-
 
 @click.command()
 @click.option('-c', '--config-file', help='config file path')
