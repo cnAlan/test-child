@@ -1,5 +1,5 @@
 # coding=utf-8
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='nmp-broker',
@@ -9,7 +9,7 @@ setup(
     description='A broker for NWPC monitor platform.',
     long_description=__doc__,
 
-    packages=['nmp_broker'],
+    packages=find_packages(exclude=['conf', 'docs', 'tests', 'templates', 'static']),
 
     include_package_data=True,
 
