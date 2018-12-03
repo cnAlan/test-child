@@ -4,6 +4,12 @@ from nmp_broker.common.data_store.rmdb import get_new_64bit_ticket
 from nmp_model.mongodb.cache.workload_cache import (
     WorkloadCacheData, WorkloadCache, JobListContent, QueueInfoListContent)
 
+try:
+    a = datetime.datetime.fromisoformat
+except AttributeError:
+    from backports.datetime_fromisoformat import MonkeyPatch
+    MonkeyPatch.patch_fromisoformat()
+
 
 def save_abnormal_jobs_to_nmp_model_system(
         owner: str, repo: str,

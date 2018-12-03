@@ -24,6 +24,7 @@ setup(
         'PyYAML',
         'redis',
         'requests',
-        'SQLAlchemy'
+        'SQLAlchemy',
+        'backports-datetime-fromisoformat;python_version<"3.7"'
     ]
 )

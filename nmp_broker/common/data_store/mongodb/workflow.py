@@ -7,6 +7,12 @@ from nmp_model.mongodb.trees.workflow_tree_node import WorkflowTreeNode
 from nmp_model.mongodb.commits.workflow_commit import WorkflowCommitData, WorkflowCommit
 from nmp_model.mongodb.cache.workflow_cache import WorkflowCacheData, WorkflowCache
 
+try:
+    a = datetime.datetime.fromisoformat
+except AttributeError:
+    from backports.datetime_fromisoformat import MonkeyPatch
+    MonkeyPatch.patch_fromisoformat()
+
 
 def save_server_status_to_nmp_model_system(
         owner: str, repo: str, server_name: str,
