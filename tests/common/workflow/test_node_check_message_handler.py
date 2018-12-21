@@ -64,13 +64,16 @@ def test_handle_sms_node_check_message_method(app):
                             },
                             {
                                 'type': 'status',
-                                'is_condition_fit': True,
-                                'expected_value': [
-                                    "submitted",
-                                    "active",
-                                    "complete"
-                                ],
-                                'value': 'active'
+                                'is_condition_fit': False,
+                                'expected_value': {
+                                    'operator': 'in',
+                                    'fields': [
+                                        "submitted",
+                                        "active",
+                                        "complete"
+                                    ]
+                                },
+                                'value': 'aborted'
                             }
                         ]
                     }
