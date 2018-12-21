@@ -49,7 +49,8 @@ def receive_workflow_status_message():
     message_data = message['data']
     owner = message_data['owner']
     repo = message_data['repo']
-    handle_status_message(owner, repo, message_data)
+    message_app = message['app']
+    handle_status_message(owner, repo, message_data, message_app)
 
     result = {
         'status': 'ok'

@@ -7,6 +7,7 @@ def test_handle_ecflow_status_method(app):
     with app.app_context():
         owner = 'nwp_xp'
         repo = 'nwpc_op'
+        message_app = 'ecflow_status_collector'
         message_data = {
             'time': '2018-09-21T15:20:59.667581',
             'server_name': 'nwpc_op',
@@ -64,7 +65,7 @@ def test_handle_ecflow_status_method(app):
             }
         }
 
-        handle_status_message(owner, repo, message_data)
+        handle_status_message(owner, repo, message_data, message_app)
 
 
 def test_handle_sms_status_method(app):
@@ -72,6 +73,7 @@ def test_handle_sms_status_method(app):
     with app.app_context():
         owner = 'nwp_xp'
         repo = 'nwpc_pd'
+        message_app = 'sms_status_collector'
         message_data = {
             "time": "2018-09-21T16:47:57.794964",
             "server_name": 'nwpc_pd',
@@ -467,4 +469,4 @@ def test_handle_sms_status_method(app):
             }
         }
 
-        handle_status_message(owner, repo, message_data)
+        handle_status_message(owner, repo, message_data, message_app)

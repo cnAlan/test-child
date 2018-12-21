@@ -1,7 +1,7 @@
 # coding=utf-8
 from datetime import datetime
 import requests
-from flask import json
+from flask import json, current_app
 from collections import defaultdict
 
 from nmp_broker.common.data_store.redis.alert import save_weixin_access_token_to_cache, get_weixin_access_token_from_cache
@@ -81,7 +81,7 @@ class WeixinApp(object):
 
         self.auth = Auth(self.weixin_config['token'])
 
-    def send_warning_message(self, warning_data:dict):
+    def send_warning_message(self, warning_data: dict):
         """
         :param warning_data:
             {
@@ -100,7 +100,11 @@ class WeixinApp(object):
         :return:
         """
         # TODO: change server_name
-        print('Get new error task. Pushing warning message to weixin...')
+        owner = warning_data['owner']
+        repo = warning_data['repo']
+        current_app.logger.info('[{owner}/{repo}] get error task. Pushing warning message to weixin...'.format(
+            owner=owner, repo=repo
+        ))
 
         auth = Auth(self.weixin_config['token'])
         weixin_access_token = auth.get_access_token()
@@ -184,7 +188,9 @@ class WeixinApp(object):
             headers=warning_post_headers,
             timeout=REQUEST_POST_TIME_OUT
         )
-        print(result.json())
+        current_app.logger.info('[{owner}/{repo}] Pushing warning message to weixin...done. {result}'.format(
+            owner=owner, repo=repo, result=result.json()
+        ))
 
     def send_sms_node_task_warn(self, message):
         auth = Auth(self.weixin_config['token'])

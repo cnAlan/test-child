@@ -50,7 +50,7 @@ def receive_workflow_status_message(owner, repo):
     message_app = message['app']
     if message_app == 'sms_status_collector' or message_app == 'ecflow_status_collector':
         message_data = message['data']
-        handle_status_message(owner, repo, message_data)
+        handle_status_message(owner, repo, message_data, message_app)
     else:
         current_app.logger.error("message app is unknown", message_app)
         result = {
